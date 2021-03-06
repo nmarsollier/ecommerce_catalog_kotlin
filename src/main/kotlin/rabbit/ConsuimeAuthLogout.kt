@@ -1,0 +1,33 @@
+package rabbit
+
+import model.security.TokenService
+import utils.rabbit.FanoutConsumer
+import utils.rabbit.RabbitEvent
+
+object ConsuimeAuthLogout {
+    fun init() {
+        FanoutConsumer("auth").apply {
+            addProcessor("logout") { e: RabbitEvent? -> processLogout(e) }
+            start()
+        }
+    }
+
+    /**
+     * @api {fanout} auth/logout Logout
+     *
+     * @apiGroup RabbitMQ GET
+     *
+     * @apiDescription Escucha de mensajes logout desde auth. Invalida sesiones en cache.
+     *
+     * @apiExample {json} Mensaje
+     * {
+     * "type": "model.article-exist",
+     * "message" : "tokenId"
+     * }
+     */
+    private fun processLogout(event: RabbitEvent?) {
+        event?.message?.toString()?.let {
+            TokenService.invalidate(it)
+        }
+    }
+}
