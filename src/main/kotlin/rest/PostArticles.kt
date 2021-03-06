@@ -1,10 +1,11 @@
 package rest
 
 import model.article.Article
-import model.article.repository.ArticleRepository
+import model.article.repository.ArticlesRepository
 import model.article.dto.ArticleData
 import model.article.dto.NewData
 import model.security.TokenService
+import model.security.validateAdminUser
 import spark.Request
 import spark.Response
 import spark.Spark
@@ -56,14 +57,14 @@ class PostArticles private constructor() {
      * @apiUse Errors
      */
     private fun addArticle(req: Request, res: Response): ArticleData {
-        TokenService.instance().validateAdmin(req.headers("Authorization"))
+        TokenService.instance().validateAdminUser(req.headers("Authorization"))
 
         val data = req.body().jsonToObject<NewData>()
         data ?: throw SimpleError("Invalid body")
 
         return Article.newArticle(data)
             .also {
-                ArticleRepository.instance().save(it)
+                ArticlesRepository.instance().save(it)
             }
             .value()
     }

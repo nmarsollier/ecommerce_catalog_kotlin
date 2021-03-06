@@ -1,4 +1,4 @@
-package model.security.dto
+package model.security.dao
 
 import com.google.gson.annotations.SerializedName
 

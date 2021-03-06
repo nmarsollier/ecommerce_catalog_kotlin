@@ -27,7 +27,7 @@ class ConsumeAuthLogout private constructor() {
      */
     private fun processLogout(event: RabbitEvent?) {
         event?.message?.toString()?.let {
-            TokenService.instance().invalidate(it)
+            TokenService.instance().invalidateTokenCache(it)
         }
     }
 

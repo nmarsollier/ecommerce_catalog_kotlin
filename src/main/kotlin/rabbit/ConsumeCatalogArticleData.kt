@@ -1,6 +1,6 @@
 package rabbit
 
-import model.article.repository.ArticleRepository
+import model.article.repository.ArticlesRepository
 import utils.env.Log
 import utils.errors.ValidationError
 import utils.gson.jsonToObject
@@ -39,7 +39,7 @@ class ConsumeCatalogArticleData private constructor() {
             try {
                 Log.info("RabbitMQ Consume model.article-data : ${it.articleId}")
                 it.validate()
-                val article = ArticleRepository.instance().findById(it.articleId).value()
+                val article = ArticlesRepository.instance().findById(it.articleId).value()
                 val data = EventArticleData(
                     articleId = article.id,
                     price = article.price,

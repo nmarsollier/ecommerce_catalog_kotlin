@@ -1,6 +1,6 @@
 package rabbit
 
-import model.article.repository.ArticleRepository
+import model.article.repository.ArticlesRepository
 import utils.env.Log
 import utils.errors.ValidationError
 import utils.gson.jsonToObject
@@ -39,7 +39,7 @@ class ConsumeCatalogArticleExist private constructor() {
             try {
                 Log.info("RabbitMQ Consume model.article-exist : ${it.articleId}")
                 it.validate()
-                val article = ArticleRepository.instance().findById(it.articleId)
+                val article = ArticlesRepository.instance().findById(it.articleId)
                 EmitArticleValidation.sendArticleValidation(event, it.copy(valid = article.isEnabled()))
             } catch (validation: ValidationError) {
                 EmitArticleValidation.sendArticleValidation(event, it.copy(valid = false))

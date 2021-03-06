@@ -1,6 +1,6 @@
 package rest
 
-import model.article.repository.ArticleRepository
+import model.article.repository.ArticlesRepository
 import model.article.dto.ArticleData
 import spark.Request
 import spark.Response
@@ -40,7 +40,7 @@ class GetArticleId private constructor() {
      * @apiUse Errors
      */
     private fun getArticle(req: Request, res: Response): ArticleData {
-        return ArticleRepository.instance().findById(req.params(":articleId")).value()
+        return ArticlesRepository.instance().findById(req.params(":articleId")).value()
     }
 
     companion object {

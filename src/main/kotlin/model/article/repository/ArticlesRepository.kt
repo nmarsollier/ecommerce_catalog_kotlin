@@ -4,7 +4,7 @@ import model.article.Article
 import utils.db.MongoStore
 import utils.errors.ValidationError
 
-class ArticleRepository private constructor(
+class ArticlesRepository private constructor(
     private var store: MongoStore = MongoStore.instance()
 ) {
 
@@ -35,10 +35,10 @@ class ArticleRepository private constructor(
     }
 
     companion object {
-        private var currentInstance: ArticleRepository? = null
+        private var currentInstance: ArticlesRepository? = null
 
-        fun instance(): ArticleRepository {
-            return currentInstance ?: ArticleRepository().also {
+        fun instance(): ArticlesRepository {
+            return currentInstance ?: ArticlesRepository().also {
                 currentInstance = it
             }
         }

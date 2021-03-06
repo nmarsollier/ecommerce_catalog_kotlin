@@ -1,7 +1,7 @@
 package rest
 
 import model.article.Article
-import model.article.repository.ArticleRepository
+import model.article.repository.ArticlesRepository
 import model.article.dto.ArticleData
 import spark.Request
 import spark.Response
@@ -45,7 +45,7 @@ class GetArticlesSearchCriteria private constructor() {
      * @apiUse Errors
      */
     private fun searchArticles(req: Request, res: Response?): List<ArticleData> {
-        return ArticleRepository.instance()
+        return ArticlesRepository.instance()
             .findByCriteria(req.params(":criteria"))
             .map { article: Article -> article.value() }
     }

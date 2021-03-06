@@ -1,8 +1,9 @@
 package rest
 
 import model.article.disable
-import model.article.repository.ArticleRepository
+import model.article.repository.ArticlesRepository
 import model.security.TokenService
+import model.security.validateAdminUser
 import spark.Request
 import spark.Response
 import spark.Spark
@@ -32,11 +33,11 @@ class DeleteArticleId private constructor() {
      * @apiUse Errors
      */
     private fun deleteArticle(req: Request, res: Response): Unit {
-        TokenService.instance().validateAdmin(req.headers("Authorization"))
+        TokenService.instance().validateAdminUser(req.headers("Authorization"))
 
-        ArticleRepository.instance().findById(req.params(":articleId")).also {
+        ArticlesRepository.instance().findById(req.params(":articleId")).also {
             it.disable()
-            ArticleRepository.instance().save(it)
+            ArticlesRepository.instance().save(it)
         }
     }
 

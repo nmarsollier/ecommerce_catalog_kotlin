@@ -3,11 +3,12 @@ package rest
 import model.article.dto.ArticleData
 import model.article.dto.DescriptionData
 import model.article.dto.NewData
-import model.article.repository.ArticleRepository
+import model.article.repository.ArticlesRepository
 import model.article.updateDescription
 import model.article.updatePrice
 import model.article.updateStock
 import model.security.TokenService
+import model.security.validateAdminUser
 import spark.Request
 import spark.Response
 import spark.Spark
@@ -59,17 +60,17 @@ class PostArticlesId private constructor() {
      * @apiUse Errors
      */
     private fun updateArticle(req: Request, res: Response): ArticleData {
-        TokenService.instance().validateAdmin(req.headers("Authorization"))
+        TokenService.instance().validateAdminUser(req.headers("Authorization"))
 
         val description = req.body().jsonToObject<DescriptionData>() ?: throw SimpleError("Invalid body")
         val otherParams = req.body().jsonToObject<NewData>() ?: throw SimpleError("Invalid body")
 
-        return ArticleRepository.instance().findById(req.params(":articleId")).let {
+        return ArticlesRepository.instance().findById(req.params(":articleId")).let {
             it.updateDescription(description)
             it.updatePrice(otherParams.price)
             it.updateStock(otherParams.stock)
 
-            ArticleRepository.instance().save(it)
+            ArticlesRepository.instance().save(it)
             it.value()
         }
     }
