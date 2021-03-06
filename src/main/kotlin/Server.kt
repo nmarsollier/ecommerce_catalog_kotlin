@@ -12,7 +12,8 @@ class Server {
     fun start() {
         Log.info("Order Service escuchando en el puerto : ${Environment.env.serverPort}")
 
-        MongoStore.init()
+        // Initialize Mongo Store
+        MongoStore.instance()
         Routes.init()
         Consumers.init()
     }

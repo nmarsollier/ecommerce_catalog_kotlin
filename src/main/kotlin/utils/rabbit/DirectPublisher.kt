@@ -14,7 +14,6 @@ import java.util.logging.Logger
  * Tanto el consumer como el publisher deben compartir estos mismos datos.
  */
 object DirectPublisher {
-    @JvmStatic
     fun publish(exchange: String?, queue: String?, message: RabbitEvent) {
         try {
             val factory = ConnectionFactory()

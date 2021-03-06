@@ -9,11 +9,8 @@ import java.util.*
  * Estos errores se pueden serializar como Json.
  */
 data class ValidationError(
-    val statusCode: Int = 400
+    var messages: MutableList<ValidationMessage> = mutableListOf()
 ) : Exception() {
-    @SerializedName("messages")
-    var messages = ArrayList<ValidationMessage>()
-
     val isEmpty: Boolean
         get() = messages.size == 0
 
@@ -33,6 +30,6 @@ data class ValidationError(
 
     data class SerializedMessage(
         @SerializedName("messages")
-        var messages: ArrayList<ValidationMessage> = ArrayList<ValidationMessage>()
+        var messages: MutableList<ValidationMessage> = mutableListOf()
     )
 }

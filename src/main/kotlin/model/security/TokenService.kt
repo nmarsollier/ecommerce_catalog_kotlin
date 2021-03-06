@@ -23,9 +23,9 @@ import java.util.concurrent.TimeUnit
  * HTTP/1.1 401 Unauthorized
  */
 
-private val UnauthorizedError = SimpleError(401, "Unauthorized")
+private val UnauthorizedError = SimpleError("Unauthorized")
 
-object TokenService {
+class TokenService {
 
     var map = CacheBuilder
         .newBuilder()
@@ -90,5 +90,16 @@ object TokenService {
         } catch (e: Exception) {
             null
         }
+    }
+
+    companion object {
+        private var currentInstance: TokenService? = null
+
+        fun instance(): TokenService {
+            return currentInstance ?: TokenService().also {
+                currentInstance = it
+            }
+        }
+
     }
 }

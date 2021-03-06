@@ -1,6 +1,6 @@
 package rabbit
 
-import model.article.ArticleRepository
+import model.article.repository.ArticleRepository
 import utils.errors.ValidationError
 import utils.gson.jsonToObject
 import utils.rabbit.DirectConsumer
@@ -38,7 +38,7 @@ object ConsumeCatalogArticleData {
             try {
                 println("RabbitMQ Consume model.article-data : " + it.articleId)
                 it.validate()
-                val article = ArticleRepository.findById(it.articleId).value()
+                val article = ArticleRepository.instance().findById(it.articleId).value()
                 val data = EventArticleData(
                     articleId = article.id,
                     price = article.price,

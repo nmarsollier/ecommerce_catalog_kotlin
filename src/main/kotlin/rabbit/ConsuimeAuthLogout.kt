@@ -27,7 +27,7 @@ object ConsuimeAuthLogout {
      */
     private fun processLogout(event: RabbitEvent?) {
         event?.message?.toString()?.let {
-            TokenService.invalidate(it)
+            TokenService.instance().invalidate(it)
         }
     }
 }

@@ -8,8 +8,7 @@ import spark.Spark
 /**
  * Filtro para habilitar Cors en Spark
  */
-object CorsFilter {
-    @JvmStatic
+class CorsFilter {
     fun init() {
         Spark.options("/*") { _, _ -> "" }
         Spark.before(object : Filter {
@@ -22,5 +21,16 @@ object CorsFilter {
                 response?.type("application/json")
             }
         })
+    }
+
+    companion object {
+        var currentInstance: CorsFilter? = null
+
+        fun init() {
+            currentInstance ?: CorsFilter().also {
+                it.init()
+                currentInstance = it
+            }
+        }
     }
 }

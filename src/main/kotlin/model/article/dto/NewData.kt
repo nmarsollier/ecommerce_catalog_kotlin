@@ -25,12 +25,10 @@ data class NewData(
     @MaxLen(40)
     val image: String? = null,
 
-    @JvmField
     @MinValue(0)
     @SerializedName("price")
     val price: Double = 0.0,
 
-    @JvmField
     @SerializedName("stock")
     @MinValue(0)
     val stock: Int = 0

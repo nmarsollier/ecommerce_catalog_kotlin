@@ -15,12 +15,12 @@ class Routes {
 
         fun init() {
             Spark.exception(ValidationError::class.java) { ex: ValidationError?, req: Request?, res: Response? ->
-                res?.status(ex?.statusCode ?: 500)
+                res?.status(400)
                 res?.body(ex?.toJson() ?: INTERNAL_ERROR)
             }
 
             Spark.exception(SimpleError::class.java) { ex: SimpleError?, req: Request?, res: Response? ->
-                res?.status(ex?.statusCode ?: 500)
+                res?.status(400)
                 res?.body(ex?.toJson() ?: INTERNAL_ERROR)
             }
 

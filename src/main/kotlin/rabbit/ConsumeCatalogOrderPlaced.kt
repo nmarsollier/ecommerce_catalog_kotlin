@@ -1,7 +1,7 @@
 package rabbit
 
 import com.google.gson.annotations.SerializedName
-import model.article.ArticleRepository
+import model.article.repository.ArticleRepository
 import utils.errors.ValidationError
 import utils.gson.jsonToObject
 import utils.rabbit.RabbitEvent
@@ -45,7 +45,7 @@ object ConsumeCatalogOrderPlaced {
                 it.validate()
                 it.articles.forEach { a ->
                     try {
-                        val article = ArticleRepository.findById(a.articleId).value()
+                        val article = ArticleRepository.instance().findById(a.articleId).value()
 
                         val data = EventArticleData(
                             articleId = article.id,
@@ -94,5 +94,4 @@ object ConsumeCatalogOrderPlaced {
             val quantity: Int = 0
         )
     }
-
 }
