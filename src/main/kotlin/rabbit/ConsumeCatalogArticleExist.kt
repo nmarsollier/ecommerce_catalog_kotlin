@@ -1,6 +1,7 @@
 package rabbit
 
 import model.article.repository.ArticleRepository
+import utils.env.Log
 import utils.errors.ValidationError
 import utils.gson.jsonToObject
 import utils.rabbit.DirectConsumer
@@ -36,14 +37,14 @@ object ConsumeCatalogArticleExist {
     private fun processArticleExist(event: RabbitEvent?) {
         event?.message?.toString()?.jsonToObject<EventArticleExist>()?.let {
             try {
-                println("RabbitMQ Consume model.article-exist : " + it.articleId)
+                Log.info("RabbitMQ Consume model.article-exist : ${it.articleId}")
                 it.validate()
                 val article = ArticleRepository.instance().findById(it.articleId)
                 EmitArticleValidation.sendArticleValidation(event, it.copy(valid = article.isEnabled()))
             } catch (validation: ValidationError) {
                 EmitArticleValidation.sendArticleValidation(event, it.copy(valid = false))
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.error(e)
             }
         }
     }

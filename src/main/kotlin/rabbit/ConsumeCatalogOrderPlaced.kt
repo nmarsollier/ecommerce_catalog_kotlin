@@ -2,6 +2,7 @@ package rabbit
 
 import com.google.gson.annotations.SerializedName
 import model.article.repository.ArticleRepository
+import utils.env.Log
 import utils.errors.ValidationError
 import utils.gson.jsonToObject
 import utils.rabbit.RabbitEvent
@@ -41,7 +42,7 @@ object ConsumeCatalogOrderPlaced {
     private fun processOrderPlaced(event: RabbitEvent?) {
         event?.message?.toString()?.jsonToObject<OrderPlacedEvent>()?.let {
             try {
-                println("RabbitMQ Consume order-placed : " + it.orderId)
+                Log.info("RabbitMQ Consume order-placed : ${it.orderId}")
                 it.validate()
                 it.articles.forEach { a ->
                     try {
@@ -66,11 +67,10 @@ object ConsumeCatalogOrderPlaced {
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.error(e)
             }
         }
     }
-
 
 
     private data class OrderPlacedEvent(
