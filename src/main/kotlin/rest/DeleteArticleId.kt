@@ -8,8 +8,8 @@ import spark.Response
 import spark.Spark
 import utils.spark.JsonTransformer
 
-class DeleteArticleId {
-    fun init() {
+class DeleteArticleId private constructor() {
+    private fun init() {
         Spark.delete(
             "/v1/articles/:articleId",
             { req: Request, res: Response ->

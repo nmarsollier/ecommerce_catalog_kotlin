@@ -15,8 +15,8 @@ import utils.errors.SimpleError
 import utils.gson.jsonToObject
 import utils.spark.JsonTransformer
 
-class PostArticlesId {
-    fun init() {
+class PostArticlesId private constructor() {
+    private fun init() {
         Spark.post(
             "/v1/articles/:articleId",
             { req: Request, res: Response ->

@@ -1,9 +1,9 @@
 package rabbit
 
-class Consumers {
+class Consumers private constructor() {
     companion object {
         fun init() {
-            ConsuimeAuthLogout.init()
+            ConsumeAuthLogout.init()
             ConsumeCatalogArticleExist.init()
             ConsumeCatalogArticleData.init()
             ConsumeCatalogOrderPlaced.init()

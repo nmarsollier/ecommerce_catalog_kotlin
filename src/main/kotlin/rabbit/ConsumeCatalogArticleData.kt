@@ -8,8 +8,8 @@ import utils.rabbit.DirectConsumer
 import utils.rabbit.RabbitEvent
 import utils.validator.validate
 
-object ConsumeCatalogArticleData {
-    fun init() {
+class ConsumeCatalogArticleData private constructor() {
+    private fun init() {
         DirectConsumer("catalog", "catalog").apply {
             addProcessor("model.article-data") { e: RabbitEvent? -> processArticleData(e) }
             start()
@@ -26,13 +26,13 @@ object ConsumeCatalogArticleData {
      *
      * @apiExample {json} Mensaje
      * {
-     * "type": "model.article-exist",
-     * "exchange" : "{Exchange name to reply}"
-     * "queue" : "{Queue name to reply}"
-     * "message" : {
-     * "referenceId": "{redId}",
-     * "articleId": "{articleId}"
-     * }
+     *      "type": "model.article-exist",
+     *      "exchange" : "{Exchange name to reply}"
+     *      "queue" : "{Queue name to reply}"
+     *      "message" : {
+     *              "referenceId": "{redId}",
+     *              "articleId": "{articleId}"
+     *      }
      */
     private fun processArticleData(event: RabbitEvent?) {
         event?.message?.toString()?.jsonToObject<EventArticleExist>()?.let {
@@ -57,6 +57,17 @@ object ConsumeCatalogArticleData {
                 EmitArticleData.sendArticleData(event, data)
             } catch (e: Exception) {
                 Log.error(e)
+            }
+        }
+    }
+
+    companion object {
+        private var currentInstance: ConsumeCatalogArticleData? = null
+
+        fun init() {
+            currentInstance ?: ConsumeCatalogArticleData().also {
+                it.init()
+                currentInstance = it
             }
         }
     }

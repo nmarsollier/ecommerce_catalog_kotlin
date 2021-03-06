@@ -12,8 +12,8 @@ import utils.errors.SimpleError
 import utils.gson.jsonToObject
 import utils.spark.JsonTransformer
 
-class PostArticles {
-    fun init() {
+class PostArticles private constructor() {
+    private fun init() {
         Spark.post(
             "/v1/articles",
             { req: Request, res: Response ->
@@ -55,7 +55,7 @@ class PostArticles {
      *
      * @apiUse Errors
      */
-    fun addArticle(req: Request, res: Response): ArticleData {
+    private fun addArticle(req: Request, res: Response): ArticleData {
         TokenService.instance().validateAdmin(req.headers("Authorization"))
 
         val data = req.body().jsonToObject<NewData>()

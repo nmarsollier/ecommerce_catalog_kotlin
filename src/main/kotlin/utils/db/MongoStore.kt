@@ -25,7 +25,7 @@ class MongoStore private constructor(
         val morphia = Morphia()
         val client = MongoClient(env.databaseUrl)
         if (_dataStore == null) {
-            _dataStore = morphia.createDatastore(client, "catalog_java").also {
+            _dataStore = morphia.createDatastore(client, "catalog_kotlin").also {
                 it.ensureIndexes()
             }
         }

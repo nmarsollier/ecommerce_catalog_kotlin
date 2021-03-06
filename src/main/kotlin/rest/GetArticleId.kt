@@ -7,8 +7,8 @@ import spark.Response
 import spark.Spark
 import utils.spark.JsonTransformer
 
-class GetArticleId {
-    fun init() {
+class GetArticleId private constructor() {
+    private fun init() {
         Spark.get(
             "/v1/articles/:articleId",
             { req: Request?, res: Response? ->

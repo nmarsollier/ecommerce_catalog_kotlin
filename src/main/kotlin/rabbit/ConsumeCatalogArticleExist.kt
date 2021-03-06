@@ -8,8 +8,8 @@ import utils.rabbit.DirectConsumer
 import utils.rabbit.RabbitEvent
 import utils.validator.validate
 
-object ConsumeCatalogArticleExist {
-    fun init() {
+class ConsumeCatalogArticleExist private constructor() {
+    private fun init() {
         DirectConsumer("catalog", "catalog").apply {
             addProcessor("model.article-exist") { e: RabbitEvent? -> processArticleExist(e) }
             start()
@@ -26,13 +26,13 @@ object ConsumeCatalogArticleExist {
      *
      * @apiExample {json} Mensaje
      * {
-     * "type": "model.article-exist",
-     * "exchange" : "{Exchange name to reply}"
-     * "queue" : "{Queue name to reply}"
-     * "message" : {
-     * "referenceId": "{redId}",
-     * "articleId": "{articleId}",
-     * }
+     *      "type": "model.article-exist",
+     *      "exchange" : "{Exchange name to reply}"
+     *      "queue" : "{Queue name to reply}"
+     *      "message" : {
+     *          "referenceId": "{redId}",
+     *          "articleId": "{articleId}",
+     *      }
      */
     private fun processArticleExist(event: RabbitEvent?) {
         event?.message?.toString()?.jsonToObject<EventArticleExist>()?.let {
@@ -45,6 +45,17 @@ object ConsumeCatalogArticleExist {
                 EmitArticleValidation.sendArticleValidation(event, it.copy(valid = false))
             } catch (e: Exception) {
                 Log.error(e)
+            }
+        }
+    }
+
+    companion object {
+        private var currentInstance: ConsumeCatalogArticleExist? = null
+
+        fun init() {
+            currentInstance ?: ConsumeCatalogArticleExist().also {
+                it.init()
+                currentInstance = it
             }
         }
     }

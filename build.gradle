@@ -1,13 +1,31 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+buildscript {
+    ext.kotlin_version = '1.4.31'
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30"
+    }
 }
 
-group 'org.example'
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.31'
+}
+
+group 'com.nmarsollier.catalog.kotlin'
 version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
+
+
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+mainClassName = 'ServerKt'
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
