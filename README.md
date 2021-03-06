@@ -1,9 +1,9 @@
 ### Si queres sabes mas sobre mi:
 [Nestor Marsollier](https://github.com/nmarsollier/profile)
 
-# Catalog Service en Java
+# Catalog Service en Kotlin
 
-Catalo Service en Java reemplaza la version realizada en Python del proyecto  [ecommerce](https://github.com/nmarsollier/ecommerce).
+Catalo Service en Kotlin reemplaza la version realizada en Python del proyecto  [ecommerce](https://github.com/nmarsollier/ecommerce).
 
 El motivo de este proyecto es para poder modelar de otra forma el mismo proyecto para poder mostrar ejemplos académicos.
 
@@ -30,9 +30,9 @@ La comunicación con Catalog y Auth es a través de rabbit.
 
 Ver tutorial de instalación en [ecommerce](https://github.com/nmarsollier/ecommerce) en la raíz.
 
-### Java
+### Kotlin
 
-Java JDK 1.8  [oracle.com](http://www.oracle.com/technetwork/es/java/javase/downloads/index.html)
+Java JDK [oracle.com](http://www.oracle.com/technetwork/es/java/javase/downloads/index.html)
 
 Gradle [gradle.org](https://gradle.org/install/)
 
@@ -92,15 +92,15 @@ Este archivo permite configurar parámetros del servidor, ver ejemplos en config
 ### Build
 
 ```bash
-docker build --no-cache -t dev-catalog-java .
+docker build --no-cache -t dev-catalog-kotlin .
 ```
 
 ### El contenedor
 
 ```bash
 # Mac | Windows
-docker run -it --name dev-catalog-java -p 3002:3002 -p 4002:4002 -v $PWD:/app dev-catalog-java
+docker run -it --name dev-catalog-kotlin -p 3002:3002 -p 4002:4002 -v $PWD:/app dev-catalog-kotlin
 
 # Linux
-docker run -it --add-host host.docker.internal:172.17.0.1 --name dev-catalog-java -p 3002:3002 -p 4002:4002 -v $PWD:/app dev-catalog-java
+docker run -it --add-host host.docker.internal:172.17.0.1 --name dev-catalog-kotlin -p 3002:3002 -p 4002:4002 -v $PWD:/app dev-catalog-kotlin
 ```
