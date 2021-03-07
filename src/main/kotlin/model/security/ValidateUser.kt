@@ -1,10 +1,10 @@
 package model.security
 
-import java.util.concurrent.ExecutionException
+import utils.errors.UnauthorizedError
 
 fun TokenService.validateUser(token: String) {
     if (token.isBlank()) {
-        throw UnauthorizedError
+        throw UnauthorizedError()
     }
 
     getUserByToken(token)

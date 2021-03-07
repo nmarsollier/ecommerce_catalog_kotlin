@@ -1,72 +1,71 @@
 package rest
 
 import model.article.Article
-import model.article.repository.ArticlesRepository
 import model.article.dto.ArticleData
 import model.article.dto.NewData
+import model.article.repository.ArticlesRepository
 import model.security.TokenService
 import model.security.validateAdminUser
 import spark.Request
 import spark.Response
-import spark.Spark
 import utils.errors.SimpleError
 import utils.gson.jsonToObject
-import utils.spark.JsonTransformer
+import utils.spark.NextFun
+import utils.spark.jsonPost
+import utils.spark.route
 
+/**
+ * @api {post} /v1/articles/ Crear Artículo
+ * @apiName Crear Artículo
+ * @apiGroup Artículos
+ *
+ * @apiUse AuthHeader
+ *
+ * @apiExample {json} Body
+ *  {
+ *      "name": "{nombre del articulo}",
+ *      "description": "{descripción del articulo}",
+ *      "image": "{id de imagen}",
+ *      "price": {precio actual},
+ *      "stock": {stock actual}
+ *  }
+ *
+ * @apiSuccessExample {json} Respuesta
+ * HTTP/1.1 200 OK
+ * {
+ *      "_id": "{id de articulo}"
+ *      "name": "{nombre del articulo}",
+ *      "description": "{descripción del articulo}",
+ *      "image": "{id de imagen}",
+ *      "price": {precio actual},
+ *      "stock": {stock actual}
+ *      "updated": {fecha ultima actualización}
+ *      "created": {fecha creación}
+ *      "enabled": {si esta activo}
+ * }
+ *
+ * @apiUse Errors
+ */
 class PostArticles private constructor() {
     private fun init() {
-        Spark.post(
+        jsonPost(
             "/v1/articles",
-            { req: Request, res: Response ->
-                addArticle(req, res)
-            },
-            JsonTransformer
-        )
+            route(
+                validateAdminUser,
+                validateBody,
+            ) { req, _ ->
+                val data = req.body().jsonToObject<NewData>()!!
+                Article.newArticle(data)
+                    .also {
+                        ArticlesRepository.instance().save(it)
+                    }
+                    .value()
+            })
     }
 
-    /**
-     * @api {post} /v1/articles/ Crear Artículo
-     * @apiName Crear Artículo
-     * @apiGroup Artículos
-     *
-     * @apiUse AuthHeader
-     *
-     * @apiExample {json} Body
-     *  {
-     *      "name": "{nombre del articulo}",
-     *      "description": "{descripción del articulo}",
-     *      "image": "{id de imagen}",
-     *      "price": {precio actual},
-     *      "stock": {stock actual}
-     *  }
-     *
-     * @apiSuccessExample {json} Respuesta
-     * HTTP/1.1 200 OK
-     * {
-     *      "_id": "{id de articulo}"
-     *      "name": "{nombre del articulo}",
-     *      "description": "{descripción del articulo}",
-     *      "image": "{id de imagen}",
-     *      "price": {precio actual},
-     *      "stock": {stock actual}
-     *      "updated": {fecha ultima actualización}
-     *      "created": {fecha creación}
-     *      "enabled": {si esta activo}
-     * }
-     *
-     * @apiUse Errors
-     */
-    private fun addArticle(req: Request, res: Response): ArticleData {
-        TokenService.instance().validateAdminUser(req.headers("Authorization"))
-
-        val data = req.body().jsonToObject<NewData>()
-        data ?: throw SimpleError("Invalid body")
-
-        return Article.newArticle(data)
-            .also {
-                ArticlesRepository.instance().save(it)
-            }
-            .value()
+    private val validateBody = { req: Request, _: Response, _: NextFun ->
+        req.body().jsonToObject<NewData>() ?: throw SimpleError("Invalid body")
+        Unit
     }
 
     companion object {

@@ -6,6 +6,7 @@ import spark.Spark
 import utils.env.Environment
 import utils.env.Log
 import utils.errors.SimpleError
+import utils.errors.UnauthorizedError
 import utils.errors.ValidationError
 import utils.gson.toJson
 import utils.spark.CorsFilter
@@ -31,6 +32,15 @@ class Routes private constructor() {
 
                 res?.status(400)
                 res?.body(ex?.toJson() ?: INTERNAL_ERROR)
+            }
+
+            Spark.exception(UnauthorizedError::class.java) { ex: UnauthorizedError?, req: Request?, res: Response? ->
+                ex?.let {
+                    Log.error(it)
+                }
+
+                res?.status(401)
+                res?.body(ex?.toJson() ?: "")
             }
 
             Spark.exception(Exception::class.java) { ex: Exception?, req: Request?, res: Response? ->

@@ -6,39 +6,34 @@ import model.security.TokenService
 import model.security.validateAdminUser
 import spark.Request
 import spark.Response
-import spark.Spark
-import utils.spark.JsonTransformer
+import utils.spark.jsonDelete
+import utils.spark.route
 
+/**
+ * @api {delete} /articles/:articleId Eliminar Artículo
+ * @apiName Eliminar Artículo
+ * @apiGroup Artículos
+ *
+ * @apiUse AuthHeader
+ *
+ * @apiSuccessExample {json} 200 Respuesta
+ * HTTP/1.1 200 OK
+ *
+ * @apiUse Errors
+ */
 class DeleteArticleId private constructor() {
     private fun init() {
-        Spark.delete(
+        jsonDelete(
             "/v1/articles/:articleId",
-            { req: Request, res: Response ->
-                deleteArticle(req, res)
-            },
-            JsonTransformer
+            route(
+                validateAdminUser,
+            ) { req, _ ->
+                ArticlesRepository.instance().findById(req.params(":articleId")).also {
+                    it.disable()
+                    ArticlesRepository.instance().save(it)
+                }
+            }
         )
-    }
-
-    /**
-     * @api {delete} /articles/:articleId Eliminar Artículo
-     * @apiName Eliminar Artículo
-     * @apiGroup Artículos
-     *
-     * @apiUse AuthHeader
-     *
-     * @apiSuccessExample {json} 200 Respuesta
-     * HTTP/1.1 200 OK
-     *
-     * @apiUse Errors
-     */
-    private fun deleteArticle(req: Request, res: Response): Unit {
-        TokenService.instance().validateAdminUser(req.headers("Authorization"))
-
-        ArticlesRepository.instance().findById(req.params(":articleId")).also {
-            it.disable()
-            ArticlesRepository.instance().save(it)
-        }
     }
 
     companion object {

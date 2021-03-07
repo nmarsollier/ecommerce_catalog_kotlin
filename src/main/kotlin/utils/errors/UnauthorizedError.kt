@@ -6,8 +6,8 @@ import utils.gson.toJson
 /**
  * Es un error simple que se puede serializar como Json.
  */
-data class SimpleError(
-    val error: String
+data class UnauthorizedError(
+    val error: String = "Unauthorized"
 ) : Exception() {
 
     fun toJson(): String {

@@ -18,7 +18,7 @@ class ArticlesRepository private constructor(
             throw ValidationError().addPath("id", "Not found")
         }
 
-        return store.findById(id)
+        return store.findById(id) ?: throw ValidationError().addPath("id", "Not found")
     }
 
     fun findByCriteria(criteria: String?): List<Article> {

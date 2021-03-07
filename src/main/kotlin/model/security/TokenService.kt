@@ -4,8 +4,7 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import model.security.dao.TokenDao
 import model.security.dao.User
-import utils.errors.SimpleError
-import java.lang.Exception
+import utils.errors.UnauthorizedError
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
@@ -18,8 +17,6 @@ import java.util.concurrent.TimeUnit
  * @apiErrorExample 401 Unauthorized
  * HTTP/1.1 401 Unauthorized
  */
-val UnauthorizedError = SimpleError("Unauthorized")
-
 class TokenService private constructor(
     private var dao: TokenDao = TokenDao.instance()
 ) {
@@ -29,7 +26,7 @@ class TokenService private constructor(
         .expireAfterWrite(60, TimeUnit.MINUTES)
         .build(object : CacheLoader<String, User>() {
             override fun load(key: String): User {
-                return dao.retrieveUser(key) ?: throw UnauthorizedError
+                return dao.retrieveUser(key) ?: throw UnauthorizedError()
             }
         })
 
