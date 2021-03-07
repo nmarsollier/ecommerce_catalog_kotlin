@@ -8,7 +8,9 @@ import utils.rabbit.DirectConsumer
 import utils.rabbit.RabbitEvent
 import utils.validator.validate
 
-class ConsumeCatalogArticleData private constructor() {
+class ConsumeCatalogArticleData private constructor(
+    private val repository: ArticlesRepository = ArticlesRepository.instance()
+) {
     private fun init() {
         DirectConsumer("catalog", "catalog").apply {
             addProcessor("model.article-data") { e: RabbitEvent? -> processArticleData(e) }
@@ -39,7 +41,7 @@ class ConsumeCatalogArticleData private constructor() {
             try {
                 Log.info("RabbitMQ Consume model.article-data : ${it.articleId}")
                 it.validate()
-                val article = ArticlesRepository.instance().findById(it.articleId).value()
+                val article = repository.findById(it.articleId!!)?.value() ?: return
                 val data = EventArticleData(
                     articleId = article.id,
                     price = article.price,

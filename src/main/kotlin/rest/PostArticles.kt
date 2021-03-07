@@ -1,11 +1,8 @@
 package rest
 
 import model.article.Article
-import model.article.dto.ArticleData
 import model.article.dto.NewData
 import model.article.repository.ArticlesRepository
-import model.security.TokenService
-import model.security.validateAdminUser
 import spark.Request
 import spark.Response
 import utils.errors.SimpleError
@@ -46,7 +43,9 @@ import utils.spark.route
  *
  * @apiUse Errors
  */
-class PostArticles private constructor() {
+class PostArticles private constructor(
+    private val repository: ArticlesRepository = ArticlesRepository.instance()
+) {
     private fun init() {
         jsonPost(
             "/v1/articles",
@@ -57,7 +56,7 @@ class PostArticles private constructor() {
                 val data = req.body().jsonToObject<NewData>()!!
                 Article.newArticle(data)
                     .also {
-                        ArticlesRepository.instance().save(it)
+                        repository.save(it)
                     }
                     .value()
             })

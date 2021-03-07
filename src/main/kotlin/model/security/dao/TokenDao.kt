@@ -1,19 +1,19 @@
 package model.security.dao
 
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
 import utils.env.Environment
 import utils.env.Log
 import utils.gson.jsonToObject
+import utils.http.HttpTools
 
-class TokenDao private constructor() {
-    fun retrieveUser(token: String?): User? {
+class TokenDao private constructor(
+    val http: HttpTools = HttpTools.instance()
+) {
+    fun retrieveUser(token: String): User? {
         return try {
-            httpClient().execute(
-                HttpGet("${Environment.env.securityServerUrl}/v1/users/current").apply {
-                    addHeader("Authorization", token)
-                }
+            http.get(
+                "${Environment.env.securityServerUrl}/v1/users/current",
+                listOf("Authorization" to token)
             ).let {
                 if (it.statusLine.statusCode != 200) {
                     return null
@@ -28,8 +28,6 @@ class TokenDao private constructor() {
             null
         }
     }
-
-    private fun httpClient() = HttpClientBuilder.create().build()
 
     companion object {
         private var currentInstance: TokenDao? = null

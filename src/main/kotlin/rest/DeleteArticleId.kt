@@ -2,10 +2,7 @@ package rest
 
 import model.article.disable
 import model.article.repository.ArticlesRepository
-import model.security.TokenService
-import model.security.validateAdminUser
-import spark.Request
-import spark.Response
+import utils.errors.ValidationError
 import utils.spark.jsonDelete
 import utils.spark.route
 
@@ -21,17 +18,20 @@ import utils.spark.route
  *
  * @apiUse Errors
  */
-class DeleteArticleId private constructor() {
+class DeleteArticleId private constructor(
+    private val repository: ArticlesRepository = ArticlesRepository.instance()
+) {
     private fun init() {
         jsonDelete(
             "/v1/articles/:articleId",
             route(
                 validateAdminUser,
+                validateArticleId
             ) { req, _ ->
-                ArticlesRepository.instance().findById(req.params(":articleId")).also {
+                repository.findById(req.params(":articleId"))?.also {
                     it.disable()
-                    ArticlesRepository.instance().save(it)
-                }
+                    repository.save(it)
+                } ?: throw ValidationError().addPath("id", "Not found")
             }
         )
     }

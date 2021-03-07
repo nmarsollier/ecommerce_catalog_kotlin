@@ -46,5 +46,4 @@ data class EventArticleExist(
 
     @SerializedName("valid")
     val valid: Boolean = false
-
 )

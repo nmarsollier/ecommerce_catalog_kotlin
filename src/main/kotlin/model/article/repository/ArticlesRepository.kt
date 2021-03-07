@@ -2,7 +2,6 @@ package model.article.repository
 
 import model.article.Article
 import utils.db.MongoStore
-import utils.errors.ValidationError
 
 class ArticlesRepository private constructor(
     private var store: MongoStore = MongoStore.instance()
@@ -13,12 +12,8 @@ class ArticlesRepository private constructor(
         return article
     }
 
-    fun findById(id: String?): Article {
-        if (id.isNullOrBlank()) {
-            throw ValidationError().addPath("id", "Not found")
-        }
-
-        return store.findById(id) ?: throw ValidationError().addPath("id", "Not found")
+    fun findById(id: String): Article? {
+        return store.findById(id)
     }
 
     fun findByCriteria(criteria: String?): List<Article> {

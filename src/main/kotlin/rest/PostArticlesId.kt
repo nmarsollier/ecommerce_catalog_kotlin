@@ -9,6 +9,7 @@ import model.article.updateStock
 import spark.Request
 import spark.Response
 import utils.errors.SimpleError
+import utils.errors.ValidationError
 import utils.gson.jsonToObject
 import utils.spark.NextFun
 import utils.spark.jsonPost
@@ -46,7 +47,9 @@ import utils.spark.route
  *
  * @apiUse Errors
  */
-class PostArticlesId private constructor() {
+class PostArticlesId private constructor(
+    private val repository: ArticlesRepository = ArticlesRepository.instance()
+) {
     private fun init() {
         jsonPost(
             "/v1/articles/:articleId",
@@ -65,17 +68,17 @@ class PostArticlesId private constructor() {
     }
 
     private val getArticleById = { req: Request, res: Response ->
-        val description = req.body().jsonToObject<DescriptionData>()!!
-        val otherParams = req.body().jsonToObject<NewData>()!!
+        repository.findById(req.params(":articleId"))?.let {
+            val description = req.body().jsonToObject<DescriptionData>()!!
+            val otherParams = req.body().jsonToObject<NewData>()!!
 
-        ArticlesRepository.instance().findById(req.params(":articleId")).let {
             it.updateDescription(description)
             it.updatePrice(otherParams.price)
             it.updateStock(otherParams.stock)
 
-            ArticlesRepository.instance().save(it)
+            repository.save(it)
             it.value()
-        }
+        } ?: ValidationError().addPath("id", "Not found")
     }
 
     companion object {
