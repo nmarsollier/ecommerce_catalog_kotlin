@@ -1,13 +1,12 @@
 package rest
 
+import io.javalin.Javalin
+import io.javalin.http.Context
 import model.article.Article
 import model.article.repository.ArticlesRepository
-import spark.Request
-import spark.Response
 import utils.errors.ValidationError
-import utils.spark.NextFun
-import utils.spark.jsonGet
-import utils.spark.route
+import utils.javalin.NextFun
+import utils.javalin.route
 
 /**
  * @api {get} /v1/articles/search/:criteria Buscar Artículo
@@ -37,20 +36,21 @@ import utils.spark.route
 class GetArticlesSearchCriteria private constructor(
     private val repository: ArticlesRepository = ArticlesRepository.instance()
 ) {
-    private fun init() {
-        jsonGet(
+    private fun init(app: Javalin) {
+        app.get(
             "/v1/articles/search/:criteria",
             route(
                 validateCriteria
-            ) { req, _ ->
-                repository.findByCriteria(req.params(":criteria"))
+            ) {
+                val result = repository.findByCriteria(it.pathParam("criteria"))
                     .map { article: Article -> article.value() }
+                it.json(result)
             }
         )
     }
 
-    private val validateCriteria = { req: Request, res: Response, next: NextFun ->
-        val id = req.params(":criteria")
+    private val validateCriteria = { ctx: Context, next: NextFun ->
+        val id = ctx.pathParam("criteria")
 
         if (id.isNullOrBlank()) {
             throw ValidationError().addPath("criteria", "Must be provided")
@@ -62,9 +62,9 @@ class GetArticlesSearchCriteria private constructor(
     companion object {
         var currentInstance: GetArticlesSearchCriteria? = null
 
-        fun init() {
+        fun init(app: Javalin) {
             currentInstance ?: GetArticlesSearchCriteria().also {
-                it.init()
+                it.init(app)
                 currentInstance = it
             }
         }

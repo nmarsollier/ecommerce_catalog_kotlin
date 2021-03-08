@@ -1,11 +1,10 @@
-package utils.spark
+package utils.javalin
 
-import spark.Request
-import spark.Response
+import io.javalin.http.Context
 
-typealias NextFun = () -> Any?
-typealias RouteFunc = (req: Request, res: Response, next: NextFun) -> Unit
-typealias HandlerFunc<T> = (req: Request, res: Response) -> T
+typealias NextFun = () -> Unit
+typealias RouteFunc = (ctx: Context, next: NextFun) -> Unit
+typealias HandlerFunc = (ctx: Context) -> Unit
 
 /**
  * Chain of responsibility router pattern
@@ -19,15 +18,12 @@ typealias HandlerFunc<T> = (req: Request, res: Response) -> T
  * @param handler The final handler, here you answer the route response
  *
  */
-fun <T> route(vararg routes: RouteFunc, handler: HandlerFunc<T?>): HandlerFunc<T?> {
-    return { req, res ->
-        var result: T? = null
+fun route(vararg routes: RouteFunc, handler: HandlerFunc): HandlerFunc {
+    return { ctx ->
         var called = false
         val functionList = mutableListOf<NextFun>()
         functionList.add(0) {
-            handler(req, res).also {
-                result = it
-            }
+            handler(ctx)
         }
 
         for (i in routes.indices.reversed()) {
@@ -39,18 +35,13 @@ fun <T> route(vararg routes: RouteFunc, handler: HandlerFunc<T?>): HandlerFunc<T
             }
 
             functionList.add(0) {
-                routes[i](req, res, nextCalled)
+                routes[i](ctx, nextCalled)
                 if (!called) {
                     next()
-                } else {
-                    null
                 }
             }
         }
 
         functionList.first().invoke()
-
-        @Suppress("UNCHECKED_CAST")
-        result
     }
 }

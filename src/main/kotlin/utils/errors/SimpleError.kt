@@ -10,9 +10,7 @@ data class SimpleError(
     val error: String
 ) : Exception() {
 
-    fun toJson(): String {
-        return SerializedMessage(error).toJson()
-    }
+    fun json() = SerializedMessage(error).toJson()
 
     data class SerializedMessage(
         @SerializedName("error")

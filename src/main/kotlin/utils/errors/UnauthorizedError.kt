@@ -10,9 +10,7 @@ data class UnauthorizedError(
     val error: String = "Unauthorized"
 ) : Exception() {
 
-    fun toJson(): String {
-        return SerializedMessage(error).toJson()
-    }
+    fun json() = SerializedMessage(error)
 
     data class SerializedMessage(
         @SerializedName("error")

@@ -18,7 +18,7 @@ data class ValidationError(
         return this
     }
 
-    fun toJson() = SerializedMessage(messages).toJson()
+    fun json() = SerializedMessage(messages)
 
     data class ValidationMessage(
         @SerializedName("path")

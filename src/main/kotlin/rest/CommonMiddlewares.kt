@@ -1,23 +1,24 @@
 package rest
 
+import io.javalin.http.Context
 import model.security.TokenService
 import model.security.validateAdminUser
 import org.bson.types.ObjectId
-import spark.Request
-import spark.Response
 import utils.env.Log
+import utils.errors.UnauthorizedError
 import utils.errors.ValidationError
-import utils.spark.NextFun
+import utils.javalin.NextFun
 
-val validateAdminUser = { req: Request, res: Response, next: NextFun ->
-    TokenService.instance().validateAdminUser(req.headers("Authorization"))
+val validateAdminUser = { ctx: Context, _: NextFun ->
+    val authHeader = ctx.header("Authorization") ?: throw UnauthorizedError()
+    TokenService.instance().validateAdminUser(authHeader)
 }
 
-val validateArticleId = { req: Request, res: Response, next: NextFun ->
+val validateArticleId = { ctx: Context, _: NextFun ->
     try {
-        val id = req.params(":articleId")
+        val id = ctx.pathParam("articleId")
 
-        if (id.isNullOrBlank()) {
+        if (id.isBlank()) {
             throw ValidationError().addPath("id", "Not found")
         }
 

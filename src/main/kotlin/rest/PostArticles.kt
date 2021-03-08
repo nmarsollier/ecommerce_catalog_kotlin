@@ -1,15 +1,14 @@
 package rest
 
+import io.javalin.Javalin
+import io.javalin.http.Context
 import model.article.Article
 import model.article.dto.NewData
 import model.article.repository.ArticlesRepository
-import spark.Request
-import spark.Response
 import utils.errors.SimpleError
 import utils.gson.jsonToObject
-import utils.spark.NextFun
-import utils.spark.jsonPost
-import utils.spark.route
+import utils.javalin.NextFun
+import utils.javalin.route
 
 /**
  * @api {post} /v1/articles/ Crear Artículo
@@ -46,33 +45,34 @@ import utils.spark.route
 class PostArticles private constructor(
     private val repository: ArticlesRepository = ArticlesRepository.instance()
 ) {
-    private fun init() {
-        jsonPost(
+    private fun init(app: Javalin) {
+        app.post(
             "/v1/articles",
             route(
                 validateAdminUser,
                 validateBody,
-            ) { req, _ ->
-                val data = req.body().jsonToObject<NewData>()!!
-                Article.newArticle(data)
+            ) {
+                val data = it.body().jsonToObject<NewData>()!!
+                val result = Article.newArticle(data)
                     .also {
                         repository.save(it)
                     }
                     .value()
+                it.json(result)
             })
     }
 
-    private val validateBody = { req: Request, _: Response, _: NextFun ->
-        req.body().jsonToObject<NewData>() ?: throw SimpleError("Invalid body")
+    private val validateBody = { ctx: Context, _: NextFun ->
+        ctx.body().jsonToObject<NewData>() ?: throw SimpleError("Invalid body")
         Unit
     }
 
     companion object {
         var currentInstance: PostArticles? = null
 
-        fun init() {
+        fun init(app: Javalin) {
             currentInstance ?: PostArticles().also {
-                it.init()
+                it.init(app)
                 currentInstance = it
             }
         }

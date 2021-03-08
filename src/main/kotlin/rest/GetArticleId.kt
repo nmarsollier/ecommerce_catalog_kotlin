@@ -1,9 +1,9 @@
 package rest
 
+import io.javalin.Javalin
 import model.article.repository.ArticlesRepository
 import utils.errors.ValidationError
-import utils.spark.jsonGet
-import utils.spark.route
+import utils.javalin.route
 
 /**
  * @api {get} /v1/articles/:articleId Buscar Artículo
@@ -29,23 +29,24 @@ import utils.spark.route
 class GetArticleId private constructor(
     private val repository: ArticlesRepository = ArticlesRepository.instance()
 ) {
-    private fun init() {
-        jsonGet(
+    private fun init(app: Javalin) {
+        app.get(
             "/v1/articles/:articleId",
             route(
                 validateArticleId
-            ) { req, _ ->
-                repository.findById(req.params(":articleId"))?.value()
+            ) {
+                val result = repository.findById(it.pathParam("articleId"))?.value()
                     ?: throw ValidationError().addPath("id", "Not found")
+                it.json(result)
             })
     }
 
     companion object {
         var currentInstance: GetArticleId? = null
 
-        fun init() {
+        fun init(app: Javalin) {
             currentInstance ?: GetArticleId().also {
-                it.init()
+                it.init(app)
                 currentInstance = it
             }
         }

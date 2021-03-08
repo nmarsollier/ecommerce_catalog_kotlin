@@ -1,19 +1,18 @@
 package rest
 
+import io.javalin.Javalin
+import io.javalin.http.Context
 import model.article.dto.DescriptionData
 import model.article.dto.NewData
 import model.article.repository.ArticlesRepository
 import model.article.updateDescription
 import model.article.updatePrice
 import model.article.updateStock
-import spark.Request
-import spark.Response
 import utils.errors.SimpleError
 import utils.errors.ValidationError
 import utils.gson.jsonToObject
-import utils.spark.NextFun
-import utils.spark.jsonPost
-import utils.spark.route
+import utils.javalin.NextFun
+import utils.javalin.route
 
 /**
  * @api {post} /v1/articles/:articleId Actualizar Artículo
@@ -50,43 +49,45 @@ import utils.spark.route
 class PostArticlesId private constructor(
     private val repository: ArticlesRepository = ArticlesRepository.instance()
 ) {
-    private fun init() {
-        jsonPost(
+    private fun init(app: Javalin) {
+        app.post(
             "/v1/articles/:articleId",
             route(
                 validateAdminUser,
-                validateBody,
-                handler = getArticleById
-            )
+                validateBody
+            ) {
+                getArticleById(it)
+            }
         )
     }
 
-    private val validateBody = { req: Request, res: Response, next: NextFun ->
-        req.body().jsonToObject<DescriptionData>() ?: throw SimpleError("Invalid body")
-        req.body().jsonToObject<NewData>() ?: throw SimpleError("Invalid body")
+    private val validateBody = { ctx: Context, _: NextFun ->
+        ctx.body().jsonToObject<DescriptionData>() ?: throw SimpleError("Invalid body")
+        ctx.body().jsonToObject<NewData>() ?: throw SimpleError("Invalid body")
         Unit
     }
 
-    private val getArticleById = { req: Request, res: Response ->
-        repository.findById(req.params(":articleId"))?.let {
-            val description = req.body().jsonToObject<DescriptionData>()!!
-            val otherParams = req.body().jsonToObject<NewData>()!!
+    private val getArticleById = { ctx: Context ->
+        repository.findById(ctx.pathParam("articleId"))?.let {
+            val description = ctx.body().jsonToObject<DescriptionData>()!!
+            val otherParams = ctx.body().jsonToObject<NewData>()!!
 
             it.updateDescription(description)
             it.updatePrice(otherParams.price)
             it.updateStock(otherParams.stock)
 
             repository.save(it)
-            it.value()
+
+            ctx.json(it.value())
         } ?: ValidationError().addPath("id", "Not found")
     }
 
     companion object {
         var currentInstance: PostArticlesId? = null
 
-        fun init() {
+        fun init(app: Javalin) {
             currentInstance ?: PostArticlesId().also {
-                it.init()
+                it.init(app)
                 currentInstance = it
             }
         }

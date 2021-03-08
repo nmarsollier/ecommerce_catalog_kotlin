@@ -1,66 +1,64 @@
 package rest
 
-import spark.Request
-import spark.Response
-import spark.Spark
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import io.javalin.Javalin
+import io.javalin.plugin.json.FromJsonMapper
+import io.javalin.plugin.json.JavalinJson
+import io.javalin.plugin.json.ToJsonMapper
 import utils.env.Environment
 import utils.env.Log
 import utils.errors.SimpleError
 import utils.errors.UnauthorizedError
 import utils.errors.ValidationError
-import utils.gson.toJson
-import utils.spark.CorsFilter
+
 
 class Routes private constructor() {
     companion object {
-        private val INTERNAL_ERROR = mapOf("error" to "Internal Server Error").toJson()
+        private val INTERNAL_ERROR = mapOf("error" to "Internal Server Error")
 
         fun init() {
-            Spark.exception(ValidationError::class.java) { ex: ValidationError?, req: Request?, res: Response? ->
-                ex?.let {
-                    Log.error(it)
-                }
+            val gson = Gson()
 
-                res?.status(400)
-                res?.body(ex?.toJson() ?: INTERNAL_ERROR)
+            JavalinJson.fromJsonMapper = object : FromJsonMapper {
+                override fun <T> map(json: String, targetClass: Class<T>) = gson.fromJson(json, targetClass)
             }
 
-            Spark.exception(SimpleError::class.java) { ex: SimpleError?, req: Request?, res: Response? ->
-                ex?.let {
-                    Log.error(it)
-                }
-
-                res?.status(400)
-                res?.body(ex?.toJson() ?: INTERNAL_ERROR)
+            JavalinJson.toJsonMapper = object : ToJsonMapper {
+                override fun map(obj: Any): String = gson.toJson(obj)
             }
 
-            Spark.exception(UnauthorizedError::class.java) { ex: UnauthorizedError?, req: Request?, res: Response? ->
-                ex?.let {
-                    Log.error(it)
-                }
+            val app = Javalin.create {
+                it.enableCorsForAllOrigins()
+                //it.addStaticFiles(Environment.env.staticLocation)
+            }.start(Environment.env.serverPort)
+            app.get("/") { ctx -> ctx.result("Hello World") }
 
-                res?.status(401)
-                res?.body(ex?.toJson() ?: "")
+            app.exception(ValidationError::class.java) { ex, ctx ->
+                Log.error(ex)
+                ctx.status(400).json(ex.json())
             }
 
-            Spark.exception(Exception::class.java) { ex: Exception?, req: Request?, res: Response? ->
-                ex?.let {
-                    Log.error(it)
-                }
-                res?.status(500)
-                res?.body(INTERNAL_ERROR)
+            app.exception(SimpleError::class.java) { ex, ctx ->
+                Log.error(ex)
+                ctx.status(400).json(ex.json())
             }
 
-            Spark.port(Environment.env.serverPort)
-            Spark.staticFiles.location(Environment.env.staticLocation)
+            app.exception(UnauthorizedError::class.java) { ex, ctx ->
+                Log.error(ex)
+                ctx.status(401).json(ex.json())
+            }
 
-            CorsFilter.init()
+            app.exception(Exception::class.java) { ex, ctx ->
+                Log.error(ex)
+                ctx.status(500).json(INTERNAL_ERROR)
+            }
 
-            PostArticles.init()
-            PostArticlesId.init()
-            GetArticleId.init()
-            DeleteArticleId.init()
-            GetArticlesSearchCriteria.init()
+            PostArticles.init(app)
+            PostArticlesId.init(app)
+            GetArticleId.init(app)
+            DeleteArticleId.init(app)
+            GetArticlesSearchCriteria.init(app)
         }
     }
 }
