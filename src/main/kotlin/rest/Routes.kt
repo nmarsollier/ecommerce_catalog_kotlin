@@ -1,19 +1,15 @@
 package rest
 
 import io.javalin.Javalin
+import io.javalin.http.staticfiles.Location
 import io.javalin.plugin.json.FromJsonMapper
 import io.javalin.plugin.json.JavalinJson
 import io.javalin.plugin.json.ToJsonMapper
 import utils.env.Environment
-import utils.env.Log
-import utils.errors.SimpleError
-import utils.errors.UnauthorizedError
-import utils.errors.ValidationError
 import utils.gson.gson
 
 class Routes private constructor() {
     companion object {
-        private val INTERNAL_ERROR = mapOf("error" to "Internal Server Error")
 
         fun init() {
             val gson = gson()
@@ -28,30 +24,10 @@ class Routes private constructor() {
 
             val app = Javalin.create {
                 it.enableCorsForAllOrigins()
-                //it.addStaticFiles(Environment.env.staticLocation)
+                it.addStaticFiles(Environment.env.staticLocation, Location.EXTERNAL)
             }.start(Environment.env.serverPort)
-            app.get("/") { ctx -> ctx.result("Hello World") }
 
-            app.exception(ValidationError::class.java) { ex, ctx ->
-                Log.error(ex)
-                ctx.status(400).json(ex.json())
-            }
-
-            app.exception(SimpleError::class.java) { ex, ctx ->
-                Log.error(ex)
-                ctx.status(400).json(ex.json())
-            }
-
-            app.exception(UnauthorizedError::class.java) { ex, ctx ->
-                Log.error(ex)
-                ctx.status(401).json(ex.json())
-            }
-
-            app.exception(Exception::class.java) { ex, ctx ->
-                Log.error(ex)
-                ctx.status(500).json(INTERNAL_ERROR)
-            }
-
+            ErrorHandler.init(app)
             PostArticles.init(app)
             PostArticlesId.init(app)
             GetArticleId.init(app)

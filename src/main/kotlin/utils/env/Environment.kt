@@ -25,6 +25,6 @@ object Environment {
         securityServerUrl = System.getenv("AUTH_SERVICE_URL") ?: "http://localhost:3000",
         rabbitServerUrl = System.getenv("RABBIT_URL") ?: "localhost",
         databaseUrl = System.getenv("MONGO_URL") ?: "localhost",
-        staticLocation = System.getenv("WWW_PATH") ?: "www"
+        staticLocation = System.getenv("WWW_PATH") ?: "${System.getProperty("user.dir")}/resources/www"
     )
 }
