@@ -1,7 +1,6 @@
 package rest
 
 import io.javalin.Javalin
-import io.javalin.http.Context
 import model.article.disable
 import model.article.repository.ArticlesRepository
 import utils.errors.ValidationError

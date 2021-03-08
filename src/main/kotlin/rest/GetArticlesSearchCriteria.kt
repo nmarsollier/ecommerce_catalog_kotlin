@@ -40,6 +40,7 @@ class GetArticlesSearchCriteria private constructor(
         app.get(
             "/v1/articles/search/:criteria",
             route(
+                logTimes,
                 validateCriteria
             ) {
                 val result = repository.findByCriteria(it.pathParam("criteria"))

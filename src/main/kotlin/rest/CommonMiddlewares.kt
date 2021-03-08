@@ -9,6 +9,12 @@ import utils.errors.UnauthorizedError
 import utils.errors.ValidationError
 import utils.javalin.NextFun
 
+val logTimes = { ctx: Context, next: NextFun ->
+    val currTime = System.currentTimeMillis()
+    next()
+    Log.info("Time consumed ${ctx.path()} = ${(System.currentTimeMillis() - currTime)} ms")
+}
+
 val validateAdminUser = { ctx: Context, _: NextFun ->
     val authHeader = ctx.header("Authorization") ?: throw UnauthorizedError()
     TokenService.instance().validateAdminUser(authHeader)

@@ -1,7 +1,6 @@
 package utils.errors
 
 import com.google.gson.annotations.SerializedName
-import utils.gson.toJson
 
 /**
  * Es un error simple que se puede serializar como Json.

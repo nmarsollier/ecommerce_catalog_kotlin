@@ -1,7 +1,5 @@
 package rest
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import io.javalin.Javalin
 import io.javalin.plugin.json.FromJsonMapper
 import io.javalin.plugin.json.JavalinJson
@@ -11,14 +9,14 @@ import utils.env.Log
 import utils.errors.SimpleError
 import utils.errors.UnauthorizedError
 import utils.errors.ValidationError
-
+import utils.gson.gson
 
 class Routes private constructor() {
     companion object {
         private val INTERNAL_ERROR = mapOf("error" to "Internal Server Error")
 
         fun init() {
-            val gson = Gson()
+            val gson = gson()
 
             JavalinJson.fromJsonMapper = object : FromJsonMapper {
                 override fun <T> map(json: String, targetClass: Class<T>) = gson.fromJson(json, targetClass)

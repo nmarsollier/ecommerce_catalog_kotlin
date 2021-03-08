@@ -1,7 +1,6 @@
 package utils.errors
 
 import com.google.gson.annotations.SerializedName
-import utils.gson.toJson
 
 /**
  * Un error de validaciones de atributos de una clase.
