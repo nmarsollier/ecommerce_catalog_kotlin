@@ -3,7 +3,7 @@
 
 # Catalog Service en Kotlin
 
-Catalo Service en Kotlin reemplaza la version realizada en Python del proyecto  [ecommerce](https://github.com/nmarsollier/ecommerce).
+Catalo Service en Kotlin del proyecto  [ecommerce](https://github.com/nmarsollier/ecommerce).
 
 El motivo de este proyecto es para poder modelar de otra forma el mismo proyecto para poder mostrar ejemplos académicos.
 
