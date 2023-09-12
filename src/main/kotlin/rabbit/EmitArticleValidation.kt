@@ -5,7 +5,7 @@ import utils.rabbit.DirectPublisher
 import utils.rabbit.RabbitEvent
 import utils.validator.Required
 
-class EmitArticleValidation private constructor() {
+class EmitArticleValidation {
     companion object {
         /**
          *

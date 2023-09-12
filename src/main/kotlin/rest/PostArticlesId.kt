@@ -1,18 +1,14 @@
 package rest
 
-import io.javalin.Javalin
-import io.javalin.http.Context
-import model.article.dto.DescriptionData
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import model.article.dto.NewData
 import model.article.repository.ArticlesRepository
 import model.article.updateDescription
 import model.article.updatePrice
 import model.article.updateStock
-import utils.errors.SimpleError
 import utils.errors.ValidationError
-import utils.gson.jsonToObject
-import utils.javalin.NextFun
-import utils.javalin.route
 
 /**
  * @api {post} /v1/articles/:articleId Actualizar Artículo
@@ -46,50 +42,25 @@ import utils.javalin.route
  *
  * @apiUse Errors
  */
-class PostArticlesId private constructor(
-    private val repository: ArticlesRepository = ArticlesRepository.instance()
+class PostArticlesId(
+    private val repository: ArticlesRepository,
+    private val commonValidations: CommonValidations
 ) {
-    private fun init(app: Javalin) {
-        app.post(
-            "/v1/articles/:articleId",
-            route(
-                validateAdminUser,
-                validateBody
-            ) {
-                getArticleById(it)
-            }
-        )
-    }
+    fun init(app: Routing) = app.apply {
+        post<NewData>("/v1/articles/{articleId}") { newData ->
+            this.call.parameters["articleId"]?.let { id ->
+                commonValidations.validateArticleId(id)
 
-    private val validateBody = { ctx: Context, _: NextFun ->
-        ctx.body().jsonToObject<DescriptionData>() ?: throw SimpleError("Invalid body")
-        ctx.body().jsonToObject<NewData>() ?: throw SimpleError("Invalid body")
-        Unit
-    }
+                repository.findById(id)?.let {
+                    it.updateDescription(newData)
+                    it.updatePrice(newData.price)
+                    it.updateStock(newData.stock)
 
-    private val getArticleById = { ctx: Context ->
-        repository.findById(ctx.pathParam("articleId"))?.let {
-            val description = ctx.body().jsonToObject<DescriptionData>()!!
-            val otherParams = ctx.body().jsonToObject<NewData>()!!
+                    repository.save(it)
 
-            it.updateDescription(description)
-            it.updatePrice(otherParams.price)
-            it.updateStock(otherParams.stock)
-
-            repository.save(it)
-
-            ctx.json(it.value())
-        } ?: ValidationError().addPath("id", "Not found")
-    }
-
-    companion object {
-        var currentInstance: PostArticlesId? = null
-
-        fun init(app: Javalin) {
-            currentInstance ?: PostArticlesId().also {
-                it.init(app)
-                currentInstance = it
-            }
+                    this.call.respond(it)
+                } ?: throw ValidationError().addPath("id", "Not found")
+            } ?: throw ValidationError().addPath("id", "Id is required")
         }
     }
 }

@@ -1,9 +1,10 @@
 package rest
 
-import io.javalin.Javalin
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import model.article.repository.ArticlesRepository
 import utils.errors.ValidationError
-import utils.javalin.route
 
 /**
  * @api {get} /v1/articles/:articleId Buscar Artículo
@@ -26,29 +27,19 @@ import utils.javalin.route
  *
  * @apiUse Errors
  */
-class GetArticleId private constructor(
-    private val repository: ArticlesRepository = ArticlesRepository.instance()
+class GetArticleId(
+    private val repository: ArticlesRepository,
+    private val commonValidations: CommonValidations
 ) {
-    private fun init(app: Javalin) {
-        app.get(
-            "/v1/articles/:articleId",
-            route(
-                validateArticleId
-            ) {
-                val result = repository.findById(it.pathParam("articleId"))?.value()
-                    ?: throw ValidationError().addPath("id", "Not found")
-                it.json(result)
-            })
-    }
+    fun init(app: Routing) = app.apply {
+        get("/v1/articles/{articleId}") {
+            this.call.parameters["articleId"]?.let { id ->
+                commonValidations.validateArticleId(id)
 
-    companion object {
-        var currentInstance: GetArticleId? = null
-
-        fun init(app: Javalin) {
-            currentInstance ?: GetArticleId().also {
-                it.init(app)
-                currentInstance = it
-            }
+                repository.findById(id)?.let {
+                    this.call.respond(it)
+                } ?: throw ValidationError().addPath("id", "Not found")
+            } ?: throw ValidationError().addPath("id", "Id is required")
         }
     }
 }

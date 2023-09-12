@@ -10,10 +10,10 @@ import utils.rabbit.TopicConsumer
 import utils.validator.Required
 import utils.validator.validate
 
-class ConsumeCatalogOrderPlaced private constructor(
-    private val repository: ArticlesRepository = ArticlesRepository.instance()
+class ConsumeCatalogOrderPlaced(
+    private val repository: ArticlesRepository
 ) {
-    private fun init() {
+    fun init() {
         TopicConsumer("sell_flow", "topic_catalog", "order_placed").apply {
             addProcessor("order-placed") { e: RabbitEvent? -> processOrderPlaced(e) }
             start()
@@ -95,16 +95,5 @@ class ConsumeCatalogOrderPlaced private constructor(
             @Required
             val quantity: Int = 0
         )
-    }
-
-    companion object {
-        private var currentInstance: ConsumeCatalogOrderPlaced? = null
-
-        fun init() {
-            currentInstance ?: ConsumeCatalogOrderPlaced().also {
-                it.init()
-                currentInstance = it
-            }
-        }
     }
 }

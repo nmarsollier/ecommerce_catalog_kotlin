@@ -1,12 +1,11 @@
 package model.article.repository
 
 import model.article.Article
-import utils.db.MongoStore
+import model.db.MongoStore
 
-class ArticlesRepository private constructor(
-    private var store: MongoStore = MongoStore.instance()
+class ArticlesRepository(
+    private var store: MongoStore
 ) {
-
     fun save(article: Article): Article {
         store.save(article)
         return article
@@ -27,15 +26,5 @@ class ArticlesRepository private constructor(
             )
             it.fetch().toList()
         } ?: emptyList()
-    }
-
-    companion object {
-        private var currentInstance: ArticlesRepository? = null
-
-        fun instance(): ArticlesRepository {
-            return currentInstance ?: ArticlesRepository().also {
-                currentInstance = it
-            }
-        }
     }
 }

@@ -8,10 +8,10 @@ import utils.rabbit.DirectConsumer
 import utils.rabbit.RabbitEvent
 import utils.validator.validate
 
-class ConsumeCatalogArticleData private constructor(
-    private val repository: ArticlesRepository = ArticlesRepository.instance()
+class ConsumeCatalogArticleData(
+    private val repository: ArticlesRepository
 ) {
-    private fun init() {
+    fun init() {
         DirectConsumer("catalog", "catalog").apply {
             addProcessor("model.article-data") { e: RabbitEvent? -> processArticleData(e) }
             start()
@@ -59,17 +59,6 @@ class ConsumeCatalogArticleData private constructor(
                 EmitArticleData.sendArticleData(event, data)
             } catch (e: Exception) {
                 Log.error(e)
-            }
-        }
-    }
-
-    companion object {
-        private var currentInstance: ConsumeCatalogArticleData? = null
-
-        fun init() {
-            currentInstance ?: ConsumeCatalogArticleData().also {
-                it.init()
-                currentInstance = it
             }
         }
     }

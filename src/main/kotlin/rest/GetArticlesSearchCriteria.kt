@@ -1,12 +1,11 @@
 package rest
 
-import io.javalin.Javalin
-import io.javalin.http.Context
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import model.article.Article
 import model.article.repository.ArticlesRepository
 import utils.errors.ValidationError
-import utils.javalin.NextFun
-import utils.javalin.route
 
 /**
  * @api {get} /v1/articles/search/:criteria Buscar Artículo
@@ -33,41 +32,25 @@ import utils.javalin.route
  *
  * @apiUse Errors
  */
-class GetArticlesSearchCriteria private constructor(
-    private val repository: ArticlesRepository = ArticlesRepository.instance()
+class GetArticlesSearchCriteria(
+    private val repository: ArticlesRepository
 ) {
-    private fun init(app: Javalin) {
-        app.get(
-            "/v1/articles/search/:criteria",
-            route(
-                logTimes,
-                validateCriteria
-            ) {
-                val result = repository.findByCriteria(it.pathParam("criteria"))
+    fun init(app: Routing) = app.apply {
+        get("/v1/articles/search/{criteria}") {
+            this.call.parameters["criteria"]?.let { criteria ->
+                validateCriteria(criteria)
+
+                val response = repository.findByCriteria(criteria)
                     .map { article: Article -> article.value() }
-                it.json(result)
-            }
-        )
-    }
-
-    private val validateCriteria = { ctx: Context, next: NextFun ->
-        val id = ctx.pathParam("criteria")
-
-        if (id.isNullOrBlank()) {
-            throw ValidationError().addPath("criteria", "Must be provided")
+                this.call.respond(response)
+            } ?: throw ValidationError().addPath("criteria", "Criteria is required")
         }
-
-        Unit
     }
 
-    companion object {
-        var currentInstance: GetArticlesSearchCriteria? = null
 
-        fun init(app: Javalin) {
-            currentInstance ?: GetArticlesSearchCriteria().also {
-                it.init(app)
-                currentInstance = it
-            }
+    private fun validateCriteria(criteria: String) {
+        if (criteria.isNullOrBlank()) {
+            throw ValidationError().addPath("criteria", "Must be provided")
         }
     }
 }

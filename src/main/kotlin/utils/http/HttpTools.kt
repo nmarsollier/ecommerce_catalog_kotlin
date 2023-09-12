@@ -16,14 +16,4 @@ class HttpTools {
             }
         )
     }
-
-    companion object {
-        private var currentInstance: HttpTools? = null
-
-        fun instance(): HttpTools {
-            return currentInstance ?: HttpTools().also {
-                currentInstance = it
-            }
-        }
-    }
 }

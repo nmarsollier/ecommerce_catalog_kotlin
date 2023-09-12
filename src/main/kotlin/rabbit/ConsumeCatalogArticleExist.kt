@@ -8,10 +8,10 @@ import utils.rabbit.DirectConsumer
 import utils.rabbit.RabbitEvent
 import utils.validator.validate
 
-class ConsumeCatalogArticleExist private constructor(
-    private val repository: ArticlesRepository = ArticlesRepository.instance()
+class ConsumeCatalogArticleExist(
+    private val repository: ArticlesRepository
 ) {
-    private fun init() {
+    fun init() {
         DirectConsumer("catalog", "catalog").apply {
             addProcessor("model.article-exist") { e: RabbitEvent? -> processArticleExist(e) }
             start()
@@ -47,17 +47,6 @@ class ConsumeCatalogArticleExist private constructor(
                 EmitArticleValidation.sendArticleValidation(event, it.copy(valid = false))
             } catch (e: Exception) {
                 Log.error(e)
-            }
-        }
-    }
-
-    companion object {
-        private var currentInstance: ConsumeCatalogArticleExist? = null
-
-        fun init() {
-            currentInstance ?: ConsumeCatalogArticleExist().also {
-                it.init()
-                currentInstance = it
             }
         }
     }

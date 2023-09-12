@@ -1,38 +1,49 @@
 package rest
 
-import io.javalin.Javalin
-import io.javalin.http.staticfiles.Location
-import io.javalin.plugin.json.FromJsonMapper
-import io.javalin.plugin.json.JavalinJson
-import io.javalin.plugin.json.ToJsonMapper
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.*
+import io.ktor.server.routing.*
 import utils.env.Environment
-import utils.gson.gson
+import io.ktor.serialization.gson.*
+import io.ktor.server.http.content.*
+import java.io.File
 
-class Routes private constructor() {
-    companion object {
+class Routes(
+    private val postArticles: PostArticles,
+    private val postArticlesId: PostArticlesId,
+    private val getArticleId: GetArticleId,
+    private val deleteArticleId: DeleteArticleId,
+    private val getArticlesSearchCriteria: GetArticlesSearchCriteria,
+    private val errorHandler: ErrorHandler
+) {
 
-        fun init() {
-            val gson = gson()
+    fun init() {
+        embeddedServer(
+            Netty,
+            port = Environment.env.serverPort,
+            module = {
+                install(CORS)
+                install(ContentNegotiation) {
+                    gson()
+                }
+                install(CallLogging)
 
-            JavalinJson.fromJsonMapper = object : FromJsonMapper {
-                override fun <T> map(json: String, targetClass: Class<T>) = gson.fromJson(json, targetClass)
+                errorHandler.init(this)
+
+                routing {
+                    staticFiles("/", File(Environment.env.staticLocation))
+
+                    postArticles.init(this)
+                    postArticlesId.init(this)
+                    getArticleId.init(this)
+                    deleteArticleId.init(this)
+                    getArticlesSearchCriteria.init(this)
+                }
             }
-
-            JavalinJson.toJsonMapper = object : ToJsonMapper {
-                override fun map(obj: Any): String = gson.toJson(obj)
-            }
-
-            val app = Javalin.create {
-                it.enableCorsForAllOrigins()
-                it.addStaticFiles(Environment.env.staticLocation, Location.EXTERNAL)
-            }.start(Environment.env.serverPort)
-
-            ErrorHandler.init(app)
-            PostArticles.init(app)
-            PostArticlesId.init(app)
-            GetArticleId.init(app)
-            DeleteArticleId.init(app)
-            GetArticlesSearchCriteria.init(app)
-        }
+        ).start(wait = true)
     }
 }

@@ -1,10 +1,11 @@
 package rest
 
-import io.javalin.Javalin
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import model.article.disable
 import model.article.repository.ArticlesRepository
 import utils.errors.ValidationError
-import utils.javalin.route
 
 /**
  * @api {delete} /articles/:articleId Eliminar Artículo
@@ -18,34 +19,22 @@ import utils.javalin.route
  *
  * @apiUse Errors
  */
-class DeleteArticleId private constructor(
-    private val repository: ArticlesRepository = ArticlesRepository.instance()
+class DeleteArticleId(
+    private val repository: ArticlesRepository,
+    private val commonValidations: CommonValidations
 ) {
-    private fun init(app: Javalin) {
-        app.delete(
-            "/v1/articles/:articleId",
-            route(
-                validateAdminUser,
-                validateArticleId
-            ) {
-                val result = repository.findById(it.pathParam("articleId"))?.also {
+    fun init(app: Routing) = app.apply {
+        delete("/v1/article/{articleId}") {
+            this.call.parameters["articleId"]?.let { id ->
+                commonValidations.validateArticleId(id)
+                commonValidations.validateAdminUser(this.call.authHeader)
+
+                repository.findById(id)?.let {
                     it.disable()
                     repository.save(it)
+                    this.call.respond("")
                 } ?: throw ValidationError().addPath("id", "Not found")
-
-                it.json(result)
-            }
-        )
-    }
-
-    companion object {
-        var currentInstance: DeleteArticleId? = null
-
-        fun init(app: Javalin) {
-            currentInstance ?: DeleteArticleId().also {
-                it.init(app)
-                currentInstance = it
-            }
+            } ?: throw ValidationError().addPath("id", "Id is required")
         }
     }
 }
