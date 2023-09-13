@@ -1,8 +1,8 @@
 package rabbit
 
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import model.article.dto.asArticleData
 import model.article.repository.ArticlesRepository
 import utils.env.Log
 import utils.errors.ValidationError
@@ -45,7 +45,7 @@ class ConsumeCatalogArticleData(
                 Log.info("RabbitMQ Consume model.article-data : ${it.articleId}")
                 it.validate()
                 MainScope().launch {
-                    val article = repository.findById(it.articleId!!)?.value() ?: return@launch
+                    val article = repository.findById(it.articleId!!)?.asArticleData ?: return@launch
                     val data = EventArticleData(
                         articleId = article.id,
                         price = article.price,

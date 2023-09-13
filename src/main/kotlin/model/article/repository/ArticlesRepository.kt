@@ -1,10 +1,10 @@
 package model.article.repository
 
 import com.mongodb.client.model.Filters
-import com.mongodb.client.model.TextSearchOptions
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import model.article.Article
+import model.article.ArticleEntity
 import model.db.MongoStore
 import org.bson.types.ObjectId
 import java.util.regex.Pattern
@@ -12,19 +12,25 @@ import java.util.regex.Pattern
 class ArticlesRepository(
     store: MongoStore
 ) {
-    val collection = store.collection<Article>("articles")
+    private val collection = store.collection<ArticleEntity>("articles")
 
     suspend fun save(article: Article): Article {
-        if (article.id == null) {
-            collection.insertOne(article)
+        return if (article.entity.id == null) {
+            Article(
+                article.entity.copy(
+                    id = collection.insertOne(article.entity).insertedId?.toString()
+                )
+            )
         } else {
-            collection.replaceOne(Filters.eq("_id", article.id), article)
+            collection.replaceOne(Filters.eq("_id", article.entity.id), article.entity)
+            article
         }
-        return article
     }
 
     suspend fun findById(id: String): Article? {
-        return collection.find(Filters.eq("_id", ObjectId(id))).firstOrNull()
+        return collection.find(Filters.eq("_id", ObjectId(id))).firstOrNull()?.let {
+            Article(it)
+        }
     }
 
     suspend fun findByCriteria(criteria: String?): List<Article> {
@@ -37,6 +43,6 @@ class ArticlesRepository(
                     Filters.regex("description.description", filter)
                 )
             )
-        ).limit(100).toList()
+        ).limit(100).toList().map { Article(it) }
     }
 }

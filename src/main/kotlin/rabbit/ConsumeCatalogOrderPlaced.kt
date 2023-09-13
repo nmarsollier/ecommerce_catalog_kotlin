@@ -3,6 +3,7 @@ package rabbit
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import model.article.dto.asArticleData
 import model.article.repository.ArticlesRepository
 import utils.env.Log
 import utils.errors.ValidationError
@@ -51,7 +52,7 @@ class ConsumeCatalogOrderPlaced(
                 it.articles.forEach { a ->
                     try {
                         MainScope().launch {
-                            val article = repository.findById(a.articleId!!)?.value() ?: return@launch
+                            val article = repository.findById(a.articleId!!)?.asArticleData ?: return@launch
 
                             val data = EventArticleData(
                                 articleId = article.id,

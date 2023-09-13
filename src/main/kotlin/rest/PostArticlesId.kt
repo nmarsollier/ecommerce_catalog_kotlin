@@ -5,9 +5,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import model.article.dto.NewData
 import model.article.repository.ArticlesRepository
-import model.article.updateDescription
-import model.article.updatePrice
-import model.article.updateStock
 import utils.errors.ValidationError
 
 /**

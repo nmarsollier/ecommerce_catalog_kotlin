@@ -9,7 +9,6 @@ import org.bson.codecs.configuration.CodecRegistry
 import org.bson.codecs.pojo.PojoCodecProvider
 import utils.env.Environment.env
 
-
 /**
  * Permite la configuración del acceso a la db
  */

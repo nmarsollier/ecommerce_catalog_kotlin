@@ -3,6 +3,7 @@ package rest
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import model.article.dto.asArticleData
 import model.article.repository.ArticlesRepository
 import utils.errors.ValidationError
 
@@ -37,7 +38,7 @@ class GetArticleId(
                 commonValidations.validateArticleId(id)
 
                 repository.findById(id)?.let {
-                    this.call.respond(it.value())
+                    this.call.respond(it.asArticleData)
                 } ?: throw ValidationError().addPath("id", "Not found")
             } ?: throw ValidationError().addPath("id", "Id is required")
         }

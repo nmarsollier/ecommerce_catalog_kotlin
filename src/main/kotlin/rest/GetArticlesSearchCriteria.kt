@@ -4,6 +4,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import model.article.Article
+import model.article.dto.asArticleData
 import model.article.repository.ArticlesRepository
 import utils.errors.ValidationError
 
@@ -41,7 +42,7 @@ class GetArticlesSearchCriteria(
                 validateCriteria(criteria)
 
                 val response = repository.findByCriteria(criteria)
-                    .map { article: Article -> article.value() }
+                    .map { article: Article -> article.asArticleData }
                 this.call.respond(response)
             } ?: throw ValidationError().addPath("criteria", "Criteria is required")
         }

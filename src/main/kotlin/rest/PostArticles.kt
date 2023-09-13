@@ -5,6 +5,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import model.article.Article
 import model.article.dto.NewData
+import model.article.dto.asArticleData
 import model.article.repository.ArticlesRepository
 
 /**
@@ -51,7 +52,7 @@ class PostArticles(
                 .also { article ->
                     repository.save(article)
                 }
-                .value()
+                .asArticleData
             this.call.respond(result)
         }
     }

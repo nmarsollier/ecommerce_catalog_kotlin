@@ -1,6 +1,7 @@
 package model.article.dto
 
 import com.google.gson.annotations.SerializedName
+import model.article.Article
 import utils.validator.MaxLen
 import utils.validator.MinLen
 import utils.validator.Required
@@ -36,3 +37,14 @@ data class ArticleData(
     @SerializedName("enabled")
     val enabled: Boolean = true
 )
+
+val Article.asArticleData
+    get() = ArticleData(
+        id = this.entity.id,
+        name = this.entity.description?.name,
+        description = this.entity.description?.description,
+        image = this.entity.description?.image,
+        price = this.entity.price,
+        stock = this.entity.stock,
+        enabled = this.entity.enabled
+    )

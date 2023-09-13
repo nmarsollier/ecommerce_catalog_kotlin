@@ -1,4 +1,4 @@
-package model.article
+package model
 
 import model.article.repository.ArticlesRepository
 import org.koin.core.module.dsl.singleOf
