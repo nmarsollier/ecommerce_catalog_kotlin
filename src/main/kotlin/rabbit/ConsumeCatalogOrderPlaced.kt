@@ -1,6 +1,8 @@
 package rabbit
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import model.article.repository.ArticlesRepository
 import utils.env.Log
 import utils.errors.ValidationError
@@ -48,17 +50,19 @@ class ConsumeCatalogOrderPlaced(
                 it.validate()
                 it.articles.forEach { a ->
                     try {
-                        val article = repository.findById(a.articleId!!)?.value() ?: return
+                        MainScope().launch {
+                            val article = repository.findById(a.articleId!!)?.value() ?: return@launch
 
-                        val data = EventArticleData(
-                            articleId = article.id,
-                            price = article.price,
-                            referenceId = it.orderId,
-                            stock = article.stock,
-                            valid = article.enabled
-                        )
+                            val data = EventArticleData(
+                                articleId = article.id,
+                                price = article.price,
+                                referenceId = it.orderId,
+                                stock = article.stock,
+                                valid = article.enabled
+                            )
 
-                        EmitArticleData.sendArticleData(event, data)
+                            EmitArticleData.sendArticleData(event, data)
+                        }
                     } catch (validation: ValidationError) {
                         val data = EventArticleData(
                             articleId = a.articleId,

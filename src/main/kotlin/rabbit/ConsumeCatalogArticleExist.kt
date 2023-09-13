@@ -1,5 +1,7 @@
 package rabbit
 
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import model.article.repository.ArticlesRepository
 import utils.env.Log
 import utils.errors.ValidationError
@@ -41,8 +43,10 @@ class ConsumeCatalogArticleExist(
             try {
                 Log.info("RabbitMQ Consume model.article-exist : ${it.articleId}")
                 it.validate()
-                val article = repository.findById(it.articleId!!) ?: return
-                EmitArticleValidation.sendArticleValidation(event, it.copy(valid = article.isEnabled()))
+                MainScope().launch {
+                    val article = repository.findById(it.articleId!!) ?: return@launch
+                    EmitArticleValidation.sendArticleValidation(event, it.copy(valid = article.isEnabled()))
+                }
             } catch (validation: ValidationError) {
                 EmitArticleValidation.sendArticleValidation(event, it.copy(valid = false))
             } catch (e: Exception) {

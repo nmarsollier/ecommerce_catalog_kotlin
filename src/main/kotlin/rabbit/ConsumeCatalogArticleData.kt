@@ -1,5 +1,8 @@
 package rabbit
 
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import model.article.repository.ArticlesRepository
 import utils.env.Log
 import utils.errors.ValidationError
@@ -41,15 +44,17 @@ class ConsumeCatalogArticleData(
             try {
                 Log.info("RabbitMQ Consume model.article-data : ${it.articleId}")
                 it.validate()
-                val article = repository.findById(it.articleId!!)?.value() ?: return
-                val data = EventArticleData(
-                    articleId = article.id,
-                    price = article.price,
-                    referenceId = it.referenceId,
-                    stock = article.stock,
-                    valid = article.enabled
-                )
-                EmitArticleData.sendArticleData(event, data)
+                MainScope().launch {
+                    val article = repository.findById(it.articleId!!)?.value() ?: return@launch
+                    val data = EventArticleData(
+                        articleId = article.id,
+                        price = article.price,
+                        referenceId = it.referenceId,
+                        stock = article.stock,
+                        valid = article.enabled
+                    )
+                    EmitArticleData.sendArticleData(event, data)
+                }
             } catch (validation: ValidationError) {
                 val data = EventArticleData(
                     articleId = it.articleId,

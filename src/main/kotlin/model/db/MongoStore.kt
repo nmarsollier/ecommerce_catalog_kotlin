@@ -1,36 +1,33 @@
 package model.db
 
-import com.mongodb.MongoClient
-import org.bson.types.ObjectId
-import org.mongodb.morphia.Datastore
-import org.mongodb.morphia.Key
-import org.mongodb.morphia.Morphia
-import org.mongodb.morphia.query.Query
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
+import com.mongodb.kotlin.client.coroutine.MongoClient
+import com.mongodb.kotlin.client.coroutine.MongoCollection
+import org.bson.codecs.configuration.CodecRegistries
+import org.bson.codecs.configuration.CodecRegistry
+import org.bson.codecs.pojo.PojoCodecProvider
 import utils.env.Environment.env
+
 
 /**
  * Permite la configuración del acceso a la db
  */
 class MongoStore {
-    val dataStore: Datastore
+    var pojoCodecRegistry: CodecRegistry =
+        CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
+    var codecRegistry: CodecRegistry =
+        CodecRegistries.fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry)
 
-    init {
-        val morphia = Morphia()
-        val client = MongoClient(env.databaseUrl)
-        dataStore = morphia.createDatastore(client, "catalog_kotlin").also {
-            it.ensureIndexes()
-        }
-    }
+    var clientSettings = MongoClientSettings.builder()
+        .applyConnectionString(ConnectionString(env.databaseUrl))
+        .codecRegistry(codecRegistry)
+        .build()
 
-    fun <T> save(entity: T): Key<T> {
-        return dataStore.save(entity)
-    }
+    private val client = MongoClient.create(clientSettings)
+    val database = client.getDatabase(databaseName = "catalog_kotlin")
 
-    inline fun <reified T> findById(id: String): T {
-        return dataStore[T::class.java, ObjectId(id)]
-    }
-
-    inline fun <reified T> createQuery(): Query<T>? {
-        return dataStore.createQuery(T::class.java)
+    inline fun <reified T : Any> collection(collectionName: String): MongoCollection<T> {
+        return database.getCollection<T>(collectionName = collectionName)
     }
 }

@@ -9,7 +9,7 @@ import utils.validator.Required
  * Objeto valor para artículos.
  */
 data class ArticleData(
-    @SerializedName("_id")
+    @SerializedName("id")
     val id: String? = null,
 
     @SerializedName("name")

@@ -37,7 +37,7 @@ class GetArticleId(
                 commonValidations.validateArticleId(id)
 
                 repository.findById(id)?.let {
-                    this.call.respond(it)
+                    this.call.respond(it.value())
                 } ?: throw ValidationError().addPath("id", "Not found")
             } ?: throw ValidationError().addPath("id", "Id is required")
         }

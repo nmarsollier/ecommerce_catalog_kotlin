@@ -46,7 +46,7 @@ class GetArticlesSearchCriteria(
             } ?: throw ValidationError().addPath("criteria", "Criteria is required")
         }
     }
-    
+
     private fun validateCriteria(criteria: String) {
         if (criteria.isNullOrBlank()) {
             throw ValidationError().addPath("criteria", "Must be provided")

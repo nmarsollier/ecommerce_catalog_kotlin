@@ -1,28 +1,29 @@
 package model.article
 
+import com.google.gson.annotations.SerializedName
 import model.article.dto.ArticleData
 import model.article.dto.NewData
+import org.bson.BsonType
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.codecs.pojo.annotations.BsonRepresentation
 import org.bson.types.ObjectId
-import org.mongodb.morphia.annotations.Entity
-import org.mongodb.morphia.annotations.Id
 import utils.validator.validate
 import java.util.*
 
 /**
  * Es el Agregado principal de Articulo.
  */
-@Entity("articles")
-class Article {
-    @Id
-    val id: ObjectId? = null
-    internal var description: Description? = null
-    internal var price = 0.0
-    internal var stock = 0
-    internal var updated = Date()
-    internal val created = Date()
-    internal var enabled = true
-
-
+data class Article(
+    @BsonId
+    @BsonRepresentation(BsonType.OBJECT_ID)
+    val id: String? = null,
+    internal var description: Description? = null,
+    internal var price: Double = 0.0,
+    internal var stock: Int = 0,
+    internal var updated: Date = Date(),
+    internal val created: Date = Date(),
+    internal var enabled: Boolean = true
+) {
     fun isEnabled(): Boolean {
         return enabled
     }
@@ -33,7 +34,7 @@ class Article {
      */
     fun value(): ArticleData {
         return ArticleData(
-            id = id?.toHexString(),
+            id = id,
             name = description?.name,
             description = description?.description,
             image = description?.image,
