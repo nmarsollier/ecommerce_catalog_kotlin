@@ -27,6 +27,5 @@ class Server : KoinComponent {
 
         routes.init()
         consumers.init()
-        Log.info("Order Service escuchando en el puerto : ${Environment.env.serverPort}")
     }
 }
