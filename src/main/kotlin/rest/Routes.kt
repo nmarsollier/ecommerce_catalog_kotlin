@@ -10,6 +10,7 @@ import io.ktor.server.routing.*
 import utils.env.Environment
 import io.ktor.serialization.gson.*
 import io.ktor.server.http.content.*
+import utils.http.ErrorHandler
 import java.io.File
 
 class Routes(

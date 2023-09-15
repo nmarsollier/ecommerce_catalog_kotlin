@@ -1,4 +1,4 @@
-package rest
+package utils.http
 
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -7,11 +7,8 @@ import io.ktor.server.response.*
 import utils.errors.SimpleError
 import utils.errors.UnauthorizedError
 import utils.errors.ValidationError
-import utils.gson.toJson
 
 class ErrorHandler {
-    private val INTERNAL_ERROR = mapOf("error" to "Internal Server Error")
-
     fun init(app: Application) = app.apply {
         install(StatusPages) {
             exception<Throwable> { call, throwable ->

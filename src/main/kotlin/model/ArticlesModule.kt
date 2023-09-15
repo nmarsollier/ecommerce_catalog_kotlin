@@ -1,6 +1,6 @@
 package model
 
-import model.article.repository.ArticlesRepository
+import model.article.ArticlesRepository
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 

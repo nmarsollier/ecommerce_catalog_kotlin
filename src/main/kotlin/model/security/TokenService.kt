@@ -21,14 +21,14 @@ class TokenService(
     private var dao: TokenDao
 ) {
     private val map = CacheBuilder
-        .newBuilder()
-        .maximumSize(1000)
-        .expireAfterWrite(60, TimeUnit.MINUTES)
-        .build(object : CacheLoader<String, User>() {
-            override fun load(key: String): User {
-                return dao.retrieveUser(key) ?: throw UnauthorizedError()
-            }
-        })
+            .newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(60, TimeUnit.MINUTES)
+            .build(object : CacheLoader<String, User>() {
+                override fun load(key: String): User {
+                    return dao.retrieveUser(key) ?: throw UnauthorizedError()
+                }
+            })
 
     /*
     Get a valid user or throws UnauthorizedError

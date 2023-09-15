@@ -1,10 +1,8 @@
-package model.article.repository
+package model.article
 
 import com.mongodb.client.model.Filters
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
-import model.article.Article
-import model.article.ArticleEntity
 import model.db.MongoStore
 import org.bson.types.ObjectId
 import java.util.regex.Pattern
@@ -45,4 +43,8 @@ class ArticlesRepository(
             )
         ).limit(100).toList().map { Article(it) }
     }
+}
+
+suspend fun Article.saveIn(repository: ArticlesRepository): Article {
+    return repository.save(this)
 }

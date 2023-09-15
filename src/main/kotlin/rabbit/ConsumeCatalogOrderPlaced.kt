@@ -3,8 +3,8 @@ package rabbit
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import model.article.ArticlesRepository
 import model.article.dto.asArticleData
-import model.article.repository.ArticlesRepository
 import utils.env.Log
 import utils.errors.ValidationError
 import utils.gson.jsonToObject

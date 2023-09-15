@@ -1,9 +1,13 @@
 package rest
 
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import model.article.repository.ArticlesRepository
+import model.article.ArticlesRepository
+import model.article.saveIn
+import model.security.TokenService
+import model.security.validateTokenIsAdminUser
 import utils.errors.ValidationError
 
 /**
@@ -20,20 +24,16 @@ import utils.errors.ValidationError
  */
 class DeleteArticleId(
     private val repository: ArticlesRepository,
-    private val commonValidations: CommonValidations
+    private val tokenService: TokenService
 ) {
     fun init(app: Routing) = app.apply {
         delete("/v1/article/{articleId}") {
-            this.call.parameters["articleId"]?.let { id ->
-                commonValidations.validateArticleId(id)
-                commonValidations.validateAdminUser(this.call.authHeader)
+            this.call.authHeader.validateTokenIsAdminUser(tokenService)
+            val id = this.call.parameters["articleId"].asArticleId
 
-                repository.findById(id)?.let {
-                    it.disable()
-                    repository.save(it)
-                    this.call.respond("")
-                } ?: throw ValidationError().addPath("id", "Not found")
-            } ?: throw ValidationError().addPath("id", "Id is required")
+            repository.findById(id)?.disable()?.saveIn(repository) ?: throw ValidationError("id" to "Not found")
+
+            this.call.respond(HttpStatusCode.OK)
         }
     }
 }

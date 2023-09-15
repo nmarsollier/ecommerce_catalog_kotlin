@@ -3,10 +3,13 @@ package rest
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import model.article.Article
-import model.article.dto.NewData
+import model.article.ArticlesRepository
+import model.article.dto.NewArticleData
 import model.article.dto.asArticleData
-import model.article.repository.ArticlesRepository
+import model.article.dto.toNewArticle
+import model.article.saveIn
+import model.security.TokenService
+import model.security.validateTokenIsAdminUser
 
 /**
  * @api {post} /v1/articles/ Crear Artículo
@@ -42,17 +45,14 @@ import model.article.repository.ArticlesRepository
  */
 class PostArticles(
     private val repository: ArticlesRepository,
-    private val commonValidations: CommonValidations
+    private val tokenService: TokenService
 ) {
     fun init(app: Routing) = app.apply {
-        post<NewData>("/v1/articles") {
-            commonValidations.validateAdminUser(this.call.authHeader)
+        post<NewArticleData>("/v1/articles") {
+            this.call.authHeader.validateTokenIsAdminUser(tokenService)
 
-            val result = Article.newArticle(it)
-                .also { article ->
-                    repository.save(article)
-                }
-                .asArticleData
+            val result = it.toNewArticle.saveIn(repository).asArticleData
+
             this.call.respond(result)
         }
     }

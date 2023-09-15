@@ -2,6 +2,7 @@ package rest
 
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+import utils.http.ErrorHandler
 
 val articlesRoutesModule = module {
     singleOf(::PostArticles)
@@ -14,5 +15,4 @@ val articlesRoutesModule = module {
 val routesModule = module {
     singleOf(::ErrorHandler)
     singleOf(::Routes)
-    singleOf(::CommonValidations)
 }

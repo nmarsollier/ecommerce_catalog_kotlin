@@ -3,8 +3,8 @@ package rest
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import model.article.ArticlesRepository
 import model.article.dto.asArticleData
-import model.article.repository.ArticlesRepository
 import utils.errors.ValidationError
 
 /**
@@ -29,18 +29,15 @@ import utils.errors.ValidationError
  * @apiUse Errors
  */
 class GetArticleId(
-    private val repository: ArticlesRepository,
-    private val commonValidations: CommonValidations
+    private val repository: ArticlesRepository
 ) {
     fun init(app: Routing) = app.apply {
         get("/v1/articles/{articleId}") {
-            this.call.parameters["articleId"]?.let { id ->
-                commonValidations.validateArticleId(id)
+            val id = this.call.parameters["articleId"].asArticleId
 
-                repository.findById(id)?.let {
-                    this.call.respond(it.asArticleData)
-                } ?: throw ValidationError().addPath("id", "Not found")
-            } ?: throw ValidationError().addPath("id", "Id is required")
+            val data = repository.findById(id)?.asArticleData ?: throw ValidationError("id" to "Not found")
+
+            this.call.respond(data)
         }
     }
 }

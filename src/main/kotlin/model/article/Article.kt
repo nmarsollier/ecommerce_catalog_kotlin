@@ -1,6 +1,6 @@
 package model.article
 
-import model.article.dto.NewData
+import model.article.dto.NewArticleData
 import org.bson.BsonType
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonRepresentation
@@ -15,17 +15,18 @@ class Article(entityRoot: ArticleEntity) {
     /**
      * Deshabilita el articulo para que no se pueda usar mas
      */
-    fun disable() {
+    fun disable(): Article {
         entity = entity.copy(
             enabled = false,
             updated = Date()
         )
+        return this
     }
 
     /**
      * Actualiza la descripción de un articulo.
      */
-    fun updateDescription(data: NewData) {
+    fun updateDescription(data: NewArticleData): Article {
         data.validate()
         entity = entity.copy(
             description = DescriptionEntity(
@@ -35,55 +36,39 @@ class Article(entityRoot: ArticleEntity) {
             ),
             updated = Date()
         )
+        return this
     }
 
     /**
      * Actualiza el precio de un articulo.
      */
-    fun updatePrice(price: Double) {
+    fun updatePrice(price: Double): Article {
         if (price < 0) {
-            throw ValidationError().addPath("price", "Inválido")
+            throw ValidationError("price" to "Inválido")
         }
 
         entity = entity.copy(
             price = price,
             updated = Date()
         )
+
+        return this
     }
 
     /**
      * Actualiza el stock actual de un articulo.
      */
-    fun updateStock(stock: Int) {
+    fun updateStock(stock: Int): Article {
         if (stock < 0) {
-            throw ValidationError().addPath("stock", "Inválido")
+            throw ValidationError("stock" to "Inválido")
         }
 
         entity = entity.copy(
             stock = stock,
             updated = Date()
         )
-    }
 
-    /**
-     * Obtiene una representación interna de los valores.
-     * Preserva la inmutabilidad de la entidad.
-     */
-    companion object {
-        fun newArticle(data: NewData): Article {
-            data.validate()
-            return Article(
-                ArticleEntity(
-                    description = DescriptionEntity(
-                        name = data.name,
-                        description = data.description,
-                        image = data.image,
-                    ),
-                    price = data.price,
-                    stock = data.stock
-                )
-            )
-        }
+        return this
     }
 }
 

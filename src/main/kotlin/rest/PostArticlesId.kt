@@ -3,8 +3,9 @@ package rest
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import model.article.dto.NewData
-import model.article.repository.ArticlesRepository
+import model.article.ArticlesRepository
+import model.article.dto.NewArticleData
+import model.article.saveIn
 import utils.errors.ValidationError
 
 /**
@@ -40,24 +41,19 @@ import utils.errors.ValidationError
  * @apiUse Errors
  */
 class PostArticlesId(
-    private val repository: ArticlesRepository,
-    private val commonValidations: CommonValidations
+    private val repository: ArticlesRepository
 ) {
     fun init(app: Routing) = app.apply {
-        post<NewData>("/v1/articles/{articleId}") { newData ->
-            this.call.parameters["articleId"]?.let { id ->
-                commonValidations.validateArticleId(id)
+        post<NewArticleData>("/v1/articles/{articleId}") { newData ->
+            val id = this.call.parameters["articleId"].asArticleId
 
-                repository.findById(id)?.let {
-                    it.updateDescription(newData)
-                    it.updatePrice(newData.price)
-                    it.updateStock(newData.stock)
+            val data = repository.findById(id)
+                    ?.updateDescription(newData)
+                    ?.updatePrice(newData.price)
+                    ?.updateStock(newData.stock)
+                    ?.saveIn(repository) ?: throw ValidationError("id" to "Not found")
 
-                    repository.save(it)
-
-                    this.call.respond(it)
-                } ?: throw ValidationError().addPath("id", "Not found")
-            } ?: throw ValidationError().addPath("id", "Id is required")
+            this.call.respond(data)
         }
     }
 }
