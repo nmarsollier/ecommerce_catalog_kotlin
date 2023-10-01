@@ -6,7 +6,7 @@ import utils.errors.ValidationError
 val String?.asArticleId: String
     get() {
         if (this.isNullOrBlank()) {
-            throw ValidationError("id" to "Not found")
+            throw ValidationError("id" to "Is Invalid")
         }
 
         try {

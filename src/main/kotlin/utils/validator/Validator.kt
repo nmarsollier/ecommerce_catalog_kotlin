@@ -9,21 +9,22 @@ import utils.errors.ValidationError
  * Este método va a tirar una excepción si no valida.
  */
 
-@Throws(ValidationError::class)
-fun Any.validate() {
-    val errors = ValidationError()
-    this.validateRequired(errors)
-    this.validateMaxLen(errors)
-    this.validateMinLen(errors)
-    this.validateMaxValue(errors)
-    this.validateMinValue(errors)
-    if (!errors.isEmpty) {
-        throw errors
+inline val <reified T : Any> T.validate: T
+    get() {
+        val errors = ValidationError()
+        this.validateRequired(errors)
+        this.validateMaxLen(errors)
+        this.validateMinLen(errors)
+        this.validateMaxValue(errors)
+        this.validateMinValue(errors)
+        if (!errors.isEmpty) {
+            throw errors
+        }
+        return this
     }
-}
 
-private fun Any.validateRequired(validations: ValidationError) {
-    this.javaClass.declaredFields.filter {
+inline fun <reified T> T.validateRequired(validations: ValidationError) {
+    T::class.java.declaredFields.filter {
         it.getAnnotation(Required::class.java)?.value != null
     }.forEach {
         try {
@@ -36,8 +37,8 @@ private fun Any.validateRequired(validations: ValidationError) {
     }
 }
 
-private fun Any.validateMinLen(validations: ValidationError) {
-    this.javaClass.declaredFields
+inline fun <reified T> T.validateMinLen(validations: ValidationError) {
+    T::class.java.declaredFields
         .filter { it.type == String::class.java } //
         .filter {
             it.getAnnotation(MinLen::class.java) != null
@@ -55,8 +56,8 @@ private fun Any.validateMinLen(validations: ValidationError) {
         }
 }
 
-private fun Any.validateMaxLen(validations: ValidationError) {
-    this.javaClass.declaredFields
+inline fun <reified T> T.validateMaxLen(validations: ValidationError) {
+    T::class.java.declaredFields
         .filter { it.type == String::class.java }
         .filter { it.getAnnotation(MaxLen::class.java) != null }
         .forEach {
@@ -72,8 +73,8 @@ private fun Any.validateMaxLen(validations: ValidationError) {
         }
 }
 
-private fun Any.validateMinValue(validations: ValidationError) {
-    this.javaClass.declaredFields
+inline fun <reified T> T.validateMinValue(validations: ValidationError) {
+    T::class.java.declaredFields
         .filter { it.getAnnotation(MinValue::class.java) != null }
         .forEach {
             try {
@@ -88,8 +89,8 @@ private fun Any.validateMinValue(validations: ValidationError) {
         }
 }
 
-private fun Any.validateMaxValue(validations: ValidationError) {
-    this.javaClass.declaredFields
+inline fun <reified T> T.validateMaxValue(validations: ValidationError) {
+    T::class.java.declaredFields
         .filter { it.getAnnotation(MaxValue::class.java) != null }
         .forEach {
             try {

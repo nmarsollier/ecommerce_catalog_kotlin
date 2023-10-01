@@ -47,11 +47,11 @@ class PostArticlesId(
         post<NewArticleData>("/v1/articles/{articleId}") { newData ->
             val id = this.call.parameters["articleId"].asArticleId
 
-            val data = repository.findById(id)
-                    ?.updateDescription(newData)
-                    ?.updatePrice(newData.price)
-                    ?.updateStock(newData.stock)
-                    ?.saveIn(repository) ?: throw ValidationError("id" to "Not found")
+            val data = (repository.findById(id) ?: throw ValidationError("id" to "Not found"))
+                .updateDescription(newData)
+                .updatePrice(newData.price)
+                .updateStock(newData.stock)
+                .saveIn(repository)
 
             this.call.respond(data)
         }

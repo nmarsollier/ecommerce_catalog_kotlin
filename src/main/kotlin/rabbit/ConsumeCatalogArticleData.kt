@@ -3,10 +3,8 @@ package rabbit
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import model.article.ArticlesRepository
-import model.article.dto.asArticleData
 import utils.env.Log
 import utils.errors.ValidationError
-import utils.gson.jsonToObject
 import utils.rabbit.DirectConsumer
 import utils.rabbit.RabbitEvent
 import utils.validator.validate
@@ -40,28 +38,20 @@ class ConsumeCatalogArticleData(
      *      }
      */
     private fun processArticleData(event: RabbitEvent?) {
-        event?.message?.toString()?.jsonToObject<EventArticleExist>()?.let {
+        event?.asEventArticleExist?.let {
             try {
                 Log.info("RabbitMQ Consume model.article-data : ${it.articleId}")
-                it.validate()
+                it.validate
                 MainScope().launch {
-                    val article = repository.findById(it.articleId!!)?.asArticleData ?: return@launch
-                    val data = EventArticleData(
-                        articleId = article.id,
-                        price = article.price,
-                        referenceId = it.referenceId,
-                        stock = article.stock,
-                        valid = article.enabled
-                    )
-                    EmitArticleData.sendArticleData(event, data)
+                    (repository.findById(it.articleId!!) ?: return@launch)
+                        .asEventArticleData(it.referenceId)
+                        .publishOn(event.exchange, event.queue)
                 }
             } catch (validation: ValidationError) {
-                val data = EventArticleData(
-                    articleId = it.articleId,
-                    referenceId = it.referenceId,
-                    valid = false
-                )
-                EmitArticleData.sendArticleData(event, data)
+                MainScope().launch {
+                    it.asEventArticleData()
+                        .publishOn(event.exchange, event.queue)
+                }
             } catch (e: Exception) {
                 Log.error(e)
             }

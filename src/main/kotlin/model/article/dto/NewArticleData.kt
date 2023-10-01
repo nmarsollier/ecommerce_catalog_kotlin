@@ -36,7 +36,7 @@ data class NewArticleData(
 
 val NewArticleData.toNewArticle: Article
     get() {
-        this.validate()
+        this.validate
 
         return Article(
             ArticleEntity(

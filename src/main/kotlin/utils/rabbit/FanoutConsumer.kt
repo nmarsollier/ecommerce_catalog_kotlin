@@ -7,7 +7,6 @@ import utils.validator.validate
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
-import kotlin.collections.HashMap
 
 /**
  * Las colas fanout son un broadcast, no necesitan queue, solo exchange que es donde se publican
@@ -54,8 +53,8 @@ class FanoutConsumer(private val exchange: String) {
                             try {
                                 body ?: return
 
-                                val event = String(body).jsonToObject<RabbitEvent>() ?: return
-                                event.validate()
+                                val event = String(body).jsonToObject<RabbitEvent>()?.validate ?: return
+
                                 listeners[event.type]?.let {
                                     Logger.getLogger("RabbitMQ").log(Level.INFO, "RabbitMQ Consume " + event.type)
                                     it.process(event)

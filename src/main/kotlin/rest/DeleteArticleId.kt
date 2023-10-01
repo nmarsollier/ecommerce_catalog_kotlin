@@ -8,7 +8,7 @@ import model.article.ArticlesRepository
 import model.article.saveIn
 import model.security.TokenService
 import model.security.validateTokenIsAdminUser
-import utils.errors.ValidationError
+import utils.errors.NotFoundError
 
 /**
  * @api {delete} /articles/:articleId Eliminar Artículo
@@ -31,7 +31,9 @@ class DeleteArticleId(
             this.call.authHeader.validateTokenIsAdminUser(tokenService)
             val id = this.call.parameters["articleId"].asArticleId
 
-            repository.findById(id)?.disable()?.saveIn(repository) ?: throw ValidationError("id" to "Not found")
+            (repository.findById(id) ?: throw NotFoundError("id"))
+                .disable()
+                .saveIn(repository)
 
             this.call.respond(HttpStatusCode.OK)
         }

@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import model.article.ArticlesRepository
-import model.article.dto.asArticleData
+import model.article.saveIn
 import utils.env.Log
 import utils.errors.ValidationError
 import utils.gson.jsonToObject
@@ -45,32 +45,22 @@ class ConsumeCatalogOrderPlaced(
      * }
      */
     private fun processOrderPlaced(event: RabbitEvent?) {
-        event?.message?.toString()?.jsonToObject<OrderPlacedEvent>()?.let {
+        event?.asOrderPlacedEvent?.let {
             try {
                 Log.info("RabbitMQ Consume order-placed : ${it.orderId}")
-                it.validate()
-                it.articles.forEach { a ->
+
+                it.validate.articles.forEach { a ->
                     try {
                         MainScope().launch {
-                            val article = repository.findById(a.articleId!!)?.asArticleData ?: return@launch
-
-                            val data = EventArticleData(
-                                articleId = article.id,
-                                price = article.price,
-                                referenceId = it.orderId,
-                                stock = article.stock,
-                                valid = article.enabled
-                            )
-
-                            EmitArticleData.sendArticleData(event, data)
+                            (repository.findById(a.articleId!!) ?: return@launch)
+                                .decreaseStock(a.quantity)
+                                .saveIn(repository)
+                                .asEventArticleData(referenceId = it.orderId)
+                                .publishOn(event.exchange, event.queue)
                         }
                     } catch (validation: ValidationError) {
-                        val data = EventArticleData(
-                            articleId = a.articleId,
-                            referenceId = it.orderId,
-                            valid = false
-                        )
-                        EmitArticleData.sendArticleData(event, data)
+                        a.asEventArticleData(referenceId = it.orderId)
+                            .publishOn(event.exchange, event.queue)
                     }
                 }
             } catch (e: Exception) {
@@ -78,27 +68,35 @@ class ConsumeCatalogOrderPlaced(
             }
         }
     }
-
-
-    private data class OrderPlacedEvent(
-        @SerializedName("orderId")
-        var orderId: String? = null,
-
-        @SerializedName("cartId")
-        val cartId: String? = null,
-
-        @SerializedName("articles")
-        val articles: Array<Article> = emptyArray()
-    ) {
-
-        data class Article(
-            @SerializedName("articleId")
-            @Required
-            val articleId: String? = null,
-
-            @SerializedName("quantity")
-            @Required
-            val quantity: Int = 0
-        )
-    }
 }
+
+private data class OrderPlacedEvent(
+    @SerializedName("orderId")
+    var orderId: String? = null,
+
+    @SerializedName("cartId")
+    val cartId: String? = null,
+
+    @SerializedName("articles")
+    val articles: Array<Article> = emptyArray()
+) {
+
+    data class Article(
+        @SerializedName("articleId")
+        @Required
+        val articleId: String? = null,
+
+        @SerializedName("quantity")
+        @Required
+        val quantity: Int = 0
+    )
+}
+
+private val RabbitEvent?.asOrderPlacedEvent
+    get() = this?.message?.toString()?.jsonToObject<OrderPlacedEvent>()?.validate
+
+private fun OrderPlacedEvent.Article.asEventArticleData(referenceId: String?) = EventArticleData(
+    articleId = this.articleId,
+    referenceId = referenceId,
+    valid = false
+)

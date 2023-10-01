@@ -27,7 +27,7 @@ class Article(entityRoot: ArticleEntity) {
      * Actualiza la descripción de un articulo.
      */
     fun updateDescription(data: NewArticleData): Article {
-        data.validate()
+        data.validate
         entity = entity.copy(
             description = DescriptionEntity(
                 name = data.name,
@@ -65,6 +65,21 @@ class Article(entityRoot: ArticleEntity) {
 
         entity = entity.copy(
             stock = stock,
+            updated = Date()
+        )
+
+        return this
+    }
+
+    fun decreaseStock(stock: Int): Article {
+        val newStock = entity.stock - stock
+
+        if (newStock < 0) {
+            throw ValidationError("stock" to "Inválido")
+        }
+
+        entity = entity.copy(
+            stock = newStock,
             updated = Date()
         )
 

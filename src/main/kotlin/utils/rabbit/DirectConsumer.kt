@@ -7,7 +7,6 @@ import utils.validator.validate
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
-import kotlin.collections.HashMap
 
 /**
  * Escuchar en una cola direct es recibir un mensaje directo,
@@ -67,8 +66,7 @@ class DirectConsumer(private val exchange: String, private val queue: String) {
         ) {
             try {
                 body ?: return
-                val event = String(body).jsonToObject<RabbitEvent>() ?: return
-                event.validate()
+                val event = String(body).jsonToObject<RabbitEvent>()?.validate ?: return
 
                 listeners[event.type]?.let {
                     Logger.getLogger("RabbitMQ").log(Level.INFO, "RabbitMQ Consume model.article-data : " + event.type)

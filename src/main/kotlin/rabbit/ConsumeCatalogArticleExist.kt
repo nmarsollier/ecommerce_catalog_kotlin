@@ -5,7 +5,6 @@ import kotlinx.coroutines.launch
 import model.article.ArticlesRepository
 import utils.env.Log
 import utils.errors.ValidationError
-import utils.gson.jsonToObject
 import utils.rabbit.DirectConsumer
 import utils.rabbit.RabbitEvent
 import utils.validator.validate
@@ -39,19 +38,21 @@ class ConsumeCatalogArticleExist(
      *      }
      */
     private fun processArticleExist(event: RabbitEvent?) {
-        event?.message?.toString()?.jsonToObject<EventArticleExist>()?.let {
+        event?.asEventArticleExist?.validate?.let { eventArticleExist ->
             try {
-                Log.info("RabbitMQ Consume model.article-exist : ${it.articleId}")
-                it.validate()
+                Log.info("RabbitMQ Consume model.article-exist : ${eventArticleExist.articleId}")
+
                 MainScope().launch {
-                    val article = repository.findById(it.articleId!!) ?: return@launch
-                    EmitArticleValidation.sendArticleValidation(
-                        event,
-                        it.copy(valid = article.entity.enabled)
-                    )
+                    val article = repository.findById(eventArticleExist.articleId!!) ?: return@launch
+
+                    eventArticleExist.copy(valid = article.entity.enabled)
+                        .publishOn(event.exchange, event.queue)
                 }
             } catch (validation: ValidationError) {
-                EmitArticleValidation.sendArticleValidation(event, it.copy(valid = false))
+                MainScope().launch {
+                    eventArticleExist.copy(valid = false)
+                        .publishOn(event.exchange, event.queue)
+                }
             } catch (e: Exception) {
                 Log.error(e)
             }

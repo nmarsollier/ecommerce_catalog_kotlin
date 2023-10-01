@@ -1,9 +1,11 @@
 package rabbit
 
 import com.google.gson.annotations.SerializedName
+import utils.gson.jsonToObject
 import utils.rabbit.DirectPublisher
 import utils.rabbit.RabbitEvent
 import utils.validator.Required
+import utils.validator.validate
 
 class EmitArticleValidation {
     companion object {
@@ -25,12 +27,12 @@ class EmitArticleValidation {
          *      }
          * }
          */
-        fun sendArticleValidation(event: RabbitEvent, send: EventArticleExist) {
+        fun sendArticleValidation(exchange: String?, queue: String?, send: EventArticleExist) {
             val eventToSend = RabbitEvent(
                 type = "model.article-exist",
                 message = send
             )
-            DirectPublisher.publish(event.exchange, event.queue, eventToSend)
+            DirectPublisher.publish(exchange, queue, eventToSend)
         }
     }
 }
@@ -46,4 +48,13 @@ data class EventArticleExist(
 
     @SerializedName("valid")
     val valid: Boolean = false
-)
+) {
+    fun publishOn(exchange: String?, queue: String?) {
+        EmitArticleValidation.sendArticleValidation(
+            exchange, queue, this
+        )
+    }
+}
+
+val RabbitEvent?.asEventArticleExist: EventArticleExist?
+    get() = this?.message?.toString()?.jsonToObject<EventArticleExist>()?.validate

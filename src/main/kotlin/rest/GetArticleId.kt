@@ -5,7 +5,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import model.article.ArticlesRepository
 import model.article.dto.asArticleData
-import utils.errors.ValidationError
+import utils.errors.NotFoundError
 
 /**
  * @api {get} /v1/articles/:articleId Buscar Artículo
@@ -35,7 +35,8 @@ class GetArticleId(
         get("/v1/articles/{articleId}") {
             val id = this.call.parameters["articleId"].asArticleId
 
-            val data = repository.findById(id)?.asArticleData ?: throw ValidationError("id" to "Not found")
+            val data = (repository.findById(id) ?: throw NotFoundError("id"))
+                .asArticleData
 
             this.call.respond(data)
         }
