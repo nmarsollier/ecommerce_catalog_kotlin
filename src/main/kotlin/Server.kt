@@ -9,8 +9,6 @@ import rabbit.rabbitModule
 import rest.Routes
 import rest.articlesRoutesModule
 import rest.routesModule
-import utils.env.Environment
-import utils.env.Log
 
 fun main() {
     Server().start()
