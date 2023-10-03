@@ -1,4 +1,4 @@
-package model
+package model.db
 
 import model.db.MongoStore
 import org.koin.core.module.dsl.singleOf

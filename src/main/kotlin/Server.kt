@@ -1,5 +1,5 @@
 import model.articlesModule
-import model.databaseModule
+import model.db.databaseModule
 import model.securityModule
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
