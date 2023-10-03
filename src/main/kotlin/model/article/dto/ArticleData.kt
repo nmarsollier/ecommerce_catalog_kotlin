@@ -10,7 +10,7 @@ import utils.validator.Required
  * Objeto valor para artículos.
  */
 data class ArticleData(
-    @SerializedName("id")
+    @SerializedName("_id")
     val id: String? = null,
 
     @SerializedName("name")
@@ -24,7 +24,6 @@ data class ArticleData(
     val description: String? = null,
 
     @SerializedName("image")
-    @MinLen(30)
     @MaxLen(40)
     val image: String? = null,
 

@@ -1,5 +1,6 @@
 package rest
 
+import io.ktor.http.*
 import io.ktor.serialization.gson.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -7,11 +8,11 @@ import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.cors.*
 import io.ktor.server.routing.*
 import utils.env.Environment
 import utils.http.ErrorHandler
 import java.io.File
+import io.ktor.server.plugins.cors.routing.CORS
 
 class Routes(
     private val postArticles: PostArticles,
@@ -27,7 +28,15 @@ class Routes(
             Netty,
             port = Environment.env.serverPort,
             module = {
-                install(CORS)
+                install(CORS){
+                    anyHost()
+                    allowMethod(HttpMethod.Options)
+                    allowMethod(HttpMethod.Put)
+                    allowMethod(HttpMethod.Patch)
+                    allowMethod(HttpMethod.Delete)
+                    allowHeader(HttpHeaders.ContentType)
+                    allowHeader(HttpHeaders.Authorization)
+                }
                 install(ContentNegotiation) {
                     gson()
                 }

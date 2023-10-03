@@ -21,7 +21,6 @@ data class NewArticleData(
     val description: String? = null,
 
     @SerializedName("image")
-    @MinLen(30)
     @MaxLen(40)
     val image: String? = null,
 

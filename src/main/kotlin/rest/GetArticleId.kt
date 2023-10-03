@@ -35,7 +35,7 @@ class GetArticleId(
         get("/v1/articles/{articleId}") {
             val id = this.call.parameters["articleId"].asArticleId
 
-            val data = (repository.findById(id) ?: throw NotFoundError("id"))
+            val data = (repository.findById(id) ?: throw NotFoundError("articleId"))
                 .asArticleData
 
             this.call.respond(data)
