@@ -20,7 +20,7 @@ class ArticlesRepository(
                 )
             )
         } else {
-            collection.replaceOne(Filters.eq("_id", article.entity.id), article.entity)
+            collection.replaceOne(Filters.eq("_id", ObjectId(article.entity.id)), article.entity)
             article
         }
     }
