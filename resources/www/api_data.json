@@ -265,7 +265,7 @@
     "examples": [
       {
         "title": "Mensaje",
-        "content": "{\n     \"type\": \"model.article-exist\",\n     \"exchange\" : \"{Exchange name to reply}\"\n     \"queue\" : \"{Queue name to reply}\"\n     \"message\" : {\n             \"referenceId\": \"{redId}\",\n             \"articleId\": \"{articleId}\"\n     }",
+        "content": "{\n     \"type\": \"article-exist\",\n     \"exchange\" : \"{Exchange name to reply}\"\n     \"queue\" : \"{Queue name to reply}\"\n     \"message\" : {\n             \"referenceId\": \"{redId}\",\n             \"articleId\": \"{articleId}\"\n     }",
         "type": "json"
       }
     ],
@@ -283,7 +283,7 @@
     "examples": [
       {
         "title": "Mensaje",
-        "content": "{\n     \"type\": \"model.article-exist\",\n     \"exchange\" : \"{Exchange name to reply}\"\n     \"queue\" : \"{Queue name to reply}\"\n     \"message\" : {\n         \"referenceId\": \"{redId}\",\n         \"articleId\": \"{articleId}\",\n     }",
+        "content": "{\n     \"type\": \"article-exist\",\n     \"exchange\" : \"{Exchange name to reply}\"\n     \"queue\" : \"{Queue name to reply}\"\n     \"message\" : {\n         \"referenceId\": \"{redId}\",\n         \"articleId\": \"{articleId}\",\n     }",
         "type": "json"
       }
     ],

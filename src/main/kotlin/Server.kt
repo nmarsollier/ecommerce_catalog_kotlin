@@ -23,7 +23,7 @@ class Server : KoinComponent {
             modules(routesModule, databaseModule, rabbitModule, articlesModule, articlesRoutesModule, securityModule)
         }
 
-        routes.init()
         consumers.init()
+        routes.init()
     }
 }

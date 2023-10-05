@@ -265,7 +265,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Mensaje",
-        "content": "{\n     \"type\": \"model.article-exist\",\n     \"exchange\" : \"{Exchange name to reply}\"\n     \"queue\" : \"{Queue name to reply}\"\n     \"message\" : {\n             \"referenceId\": \"{redId}\",\n             \"articleId\": \"{articleId}\"\n     }",
+        "content": "{\n     \"type\": \"article-exist\",\n     \"exchange\" : \"{Exchange name to reply}\"\n     \"queue\" : \"{Queue name to reply}\"\n     \"message\" : {\n             \"referenceId\": \"{redId}\",\n             \"articleId\": \"{articleId}\"\n     }",
         "type": "json"
       }
     ],
@@ -283,7 +283,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Mensaje",
-        "content": "{\n     \"type\": \"model.article-exist\",\n     \"exchange\" : \"{Exchange name to reply}\"\n     \"queue\" : \"{Queue name to reply}\"\n     \"message\" : {\n         \"referenceId\": \"{redId}\",\n         \"articleId\": \"{articleId}\",\n     }",
+        "content": "{\n     \"type\": \"article-exist\",\n     \"exchange\" : \"{Exchange name to reply}\"\n     \"queue\" : \"{Queue name to reply}\"\n     \"message\" : {\n         \"referenceId\": \"{redId}\",\n         \"articleId\": \"{articleId}\",\n     }",
         "type": "json"
       }
     ],
@@ -301,7 +301,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Mensaje",
-        "content": "{\n\"type\": \"model.article-exist\",\n\"message\" : \"tokenId\"\n}",
+        "content": "{\n\"type\": \"article-exist\",\n\"message\" : \"tokenId\"\n}",
         "type": "json"
       }
     ],
@@ -320,7 +320,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Mensaje",
-          "content": "{\n     \"type\": \"model.article-data\",\n     \"message\" : {\n         \"cartId\": \"{cartId}\",\n         \"articleId\": \"{articleId}\",\n         \"valid\": True|False,\n         \"stock\": {stock}\n         \"price\": {price}\n     }\n}",
+          "content": "{\n     \"type\": \"article-data\",\n     \"message\" : {\n         \"cartId\": \"{cartId}\",\n         \"articleId\": \"{articleId}\",\n         \"valid\": True|False,\n         \"stock\": {stock}\n         \"price\": {price}\n     }\n}",
           "type": "json"
         }
       ]
@@ -340,7 +340,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Mensaje",
-          "content": "{\n     \"type\": \"model.article-exist\",\n     \"message\" : {\n         \"cartId\": \"{cartId}\",\n         \"articleId\": \"{articleId}\",\n         \"valid\": True|False\n     }\n}",
+          "content": "{\n     \"type\": \"article-exist\",\n     \"message\" : {\n         \"cartId\": \"{cartId}\",\n         \"articleId\": \"{articleId}\",\n         \"valid\": True|False\n     }\n}",
           "type": "json"
         }
       ]

@@ -1,6 +1,7 @@
 package rabbit
 
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import model.article.ArticlesRepository
 import utils.env.Log
@@ -14,7 +15,7 @@ class ConsumeCatalogArticleExist(
 ) {
     fun init() {
         DirectConsumer("catalog", "catalog").apply {
-            addProcessor("model.article-exist") { e: RabbitEvent? -> processArticleExist(e) }
+            addProcessor("article-exist") { e: RabbitEvent? -> processArticleExist(e) }
             start()
         }
     }
@@ -29,7 +30,7 @@ class ConsumeCatalogArticleExist(
      *
      * @apiExample {json} Mensaje
      * {
-     *      "type": "model.article-exist",
+     *      "type": "article-exist",
      *      "exchange" : "{Exchange name to reply}"
      *      "queue" : "{Queue name to reply}"
      *      "message" : {
@@ -40,16 +41,16 @@ class ConsumeCatalogArticleExist(
     private fun processArticleExist(event: RabbitEvent?) {
         event?.asEventArticleExist?.validate?.let { eventArticleExist ->
             try {
-                Log.info("RabbitMQ Consume model.article-exist : ${eventArticleExist.articleId}")
+                Log.info("RabbitMQ Consume article-exist : ${eventArticleExist.articleId}")
 
-                MainScope().launch {
+                CoroutineScope(Dispatchers.IO).launch {
                     val article = repository.findById(eventArticleExist.articleId!!) ?: return@launch
 
                     eventArticleExist.copy(valid = article.entity.enabled)
                         .publishOn(event.exchange, event.queue)
                 }
             } catch (validation: ValidationError) {
-                MainScope().launch {
+                CoroutineScope(Dispatchers.IO).launch {
                     eventArticleExist.copy(valid = false)
                         .publishOn(event.exchange, event.queue)
                 }

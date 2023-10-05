@@ -19,7 +19,7 @@ class EmitArticleValidation {
          *
          * @apiSuccessExample {json} Mensaje
          * {
-         *      "type": "model.article-exist",
+         *      "type": "article-exist",
          *      "message" : {
          *          "cartId": "{cartId}",
          *          "articleId": "{articleId}",
@@ -29,7 +29,7 @@ class EmitArticleValidation {
          */
         fun sendArticleValidation(exchange: String?, queue: String?, send: EventArticleExist) {
             val eventToSend = RabbitEvent(
-                type = "model.article-exist",
+                type = "article-exist",
                 message = send
             )
             DirectPublisher.publish(exchange, queue, eventToSend)

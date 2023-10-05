@@ -418,7 +418,7 @@ Mensaje
 
 ```
 {
-     "type": "model.article-exist",
+     "type": "article-exist",
      "exchange" : "{Exchange name to reply}"
      "queue" : "{Queue name to reply}"
      "message" : {
@@ -445,7 +445,7 @@ Mensaje
 
 ```
 {
-     "type": "model.article-exist",
+     "type": "article-exist",
      "exchange" : "{Exchange name to reply}"
      "queue" : "{Queue name to reply}"
      "message" : {
@@ -472,7 +472,7 @@ Mensaje
 
 ```
 {
-"type": "model.article-exist",
+"type": "article-exist",
 "message" : "tokenId"
 }
 ```
@@ -499,7 +499,7 @@ Mensaje
 
 ```
 {
-     "type": "model.article-data",
+     "type": "article-data",
      "message" : {
          "cartId": "{cartId}",
          "articleId": "{articleId}",

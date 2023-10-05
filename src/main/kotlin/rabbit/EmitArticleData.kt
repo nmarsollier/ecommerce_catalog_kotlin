@@ -21,7 +21,7 @@ class EmitArticleData {
          *
          * @apiSuccessExample {json} Mensaje
          * {
-         *      "type": "model.article-data",
+         *      "type": "article-data",
          *      "message" : {
          *          "cartId": "{cartId}",
          *          "articleId": "{articleId}",
@@ -33,7 +33,7 @@ class EmitArticleData {
          */
         fun sendArticleData(exchange: String?, queue: String?, send: EventArticleData) {
             val eventToSend = RabbitEvent(
-                type = "model.article-data",
+                type = "article-data",
                 message = send
             )
             DirectPublisher.publish(exchange, queue, eventToSend)

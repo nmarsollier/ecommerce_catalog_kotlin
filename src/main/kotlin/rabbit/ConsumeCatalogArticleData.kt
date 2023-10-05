@@ -1,5 +1,7 @@
 package rabbit
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import model.article.ArticlesRepository
@@ -14,7 +16,7 @@ class ConsumeCatalogArticleData(
 ) {
     fun init() {
         DirectConsumer("catalog", "catalog").apply {
-            addProcessor("model.article-data") { e: RabbitEvent? -> processArticleData(e) }
+            addProcessor("article-data") { e: RabbitEvent? -> processArticleData(e) }
             start()
         }
     }
@@ -29,7 +31,7 @@ class ConsumeCatalogArticleData(
      *
      * @apiExample {json} Mensaje
      * {
-     *      "type": "model.article-exist",
+     *      "type": "article-exist",
      *      "exchange" : "{Exchange name to reply}"
      *      "queue" : "{Queue name to reply}"
      *      "message" : {
@@ -42,13 +44,13 @@ class ConsumeCatalogArticleData(
             try {
                 Log.info("RabbitMQ Consume model.article-data : ${it.articleId}")
                 it.validate
-                MainScope().launch {
+                CoroutineScope(Dispatchers.IO).launch {
                     (repository.findById(it.articleId!!) ?: return@launch)
                         .asEventArticleData(it.referenceId)
                         .publishOn(event.exchange, event.queue)
                 }
             } catch (validation: ValidationError) {
-                MainScope().launch {
+                CoroutineScope(Dispatchers.IO).launch {
                     it.asEventArticleData()
                         .publishOn(event.exchange, event.queue)
                 }
