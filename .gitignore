@@ -1,5 +1,4 @@
 ### Gradle ###
-.gradle
 build
 bin
 node_modules

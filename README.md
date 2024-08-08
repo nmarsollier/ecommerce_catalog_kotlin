@@ -32,9 +32,7 @@ Ver tutorial de instalación en [ecommerce](https://github.com/nmarsollier/ecomm
 
 ### Kotlin
 
-Java JDK [oracle.com](http://www.oracle.com/technetwork/es/java/javase/downloads/index.html)
-
-Gradle [gradle.org](https://gradle.org/install/)
+Java JDK (En este caso coretto 22, bajado desde intellij)
 
 Establecer las variables de entorno sujeridas en las instalaciones.
 Tanto los ejecutables de java, como gradle deben poder encontrarse en el path.
@@ -43,7 +41,16 @@ Tanto los ejecutables de java, como gradle deben poder encontrarse en el path.
 
 Se clona el repositorio en el directorio deseado.
 
-Nos paramos en la carpeta donde se encuentra el archivo build.gradle y ejecutamos :
+Lo mas facil es abrir el proyecto con intellij y desde Server.kt darle Run.
+
+Manualmente:
+
+Inicialmente hacemos 
+```bash
+gradle clean build
+```
+
+Para ejecutar
 ```bash
 gradle run
 ```
