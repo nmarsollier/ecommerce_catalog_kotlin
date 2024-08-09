@@ -32,7 +32,7 @@ Ver tutorial de instalación en [ecommerce](https://github.com/nmarsollier/ecomm
 
 ### Kotlin
 
-Java JDK (En este caso coretto 22, bajado desde intellij)
+Java JDK (En este caso coretto 21, bajado desde intellij) agregar JAVA_HOME y poner el directorio bin en el path.
 
 Establecer las variables de entorno sujeridas en las instalaciones.
 Tanto los ejecutables de java, como gradle deben poder encontrarse en el path.

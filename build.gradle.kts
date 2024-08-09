@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 plugins {
     id("java")
@@ -12,16 +13,23 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
 }
-kotlin {
-    jvmToolchain {
-        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(19)) // or the appropriate version
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21)) 
     }
 }
-tasks.withType<KotlinCompile> {
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = JavaVersion.VERSION_19.toString() 
+    targetCompatibility = JavaVersion.VERSION_19.toString() 
+    options.release.set(19) 
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
-        jvmTarget = "19" // or the appropriate JVM target version
+        jvmTarget = "19"
     }
 }
+
 application {
     mainClass = "ServerKt"
 }

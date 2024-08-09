@@ -4,6 +4,9 @@ bin
 node_modules
 .gradle
 
+
+.history
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
