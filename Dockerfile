@@ -1,9 +1,9 @@
 # Docker para desarrollo
-FROM gradle:6.4.1-jdk11
+FROM gradle:8.9.0-jdk21
 
-ENV RABBIT_URL host.docker.internal
-ENV MONGO_URL host.docker.internal
-ENV AUTH_SERVICE_URL http://host.docker.internal:3000
+ENV RABBIT_URL=host.docker.internal
+ENV MONGO_URL=mongodb://host.docker.internal
+ENV AUTH_SERVICE_URL=http://host.docker.internal:3000
 
 WORKDIR /app
 
