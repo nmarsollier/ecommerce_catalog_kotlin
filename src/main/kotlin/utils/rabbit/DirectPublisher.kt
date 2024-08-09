@@ -1,5 +1,6 @@
 package utils.rabbit
 
+import com.google.gson.Gson
 import com.rabbitmq.client.Channel
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
@@ -21,10 +22,9 @@ object DirectPublisher {
             val connection: Connection = factory.newConnection()
             val channel: Channel = connection.createChannel()
             channel.exchangeDeclare(exchange, "direct")
-            channel.queueDeclare(queue, false, false, false, null)
-            channel.queueBind(queue, exchange, queue)
             channel.basicPublish(exchange, queue, null, message.toJson().toByteArray())
-            Logger.getLogger("RabbitMQ").log(Level.INFO, "RabbitMQ Emit " + message.type)
+            Logger.getLogger("RabbitMQ").log(Level.INFO, "RabbitMQ Emit " + exchange + " - " + queue +" : "+ Gson().toJson(message) )
+            connection.close()
         } catch (e: Exception) {
             Logger.getLogger("RabbitMQ").log(Level.SEVERE, "RabbitMQ no se pudo encolar " + message.type, e)
         }
