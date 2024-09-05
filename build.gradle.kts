@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 plugins {
@@ -15,13 +14,13 @@ repositories {
 }
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21)) 
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 tasks.withType<JavaCompile>().configureEach {
-    sourceCompatibility = JavaVersion.VERSION_19.toString() 
-    targetCompatibility = JavaVersion.VERSION_19.toString() 
-    options.release.set(19) 
+    sourceCompatibility = JavaVersion.VERSION_19.toString()
+    targetCompatibility = JavaVersion.VERSION_19.toString()
+    options.release.set(19)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
@@ -44,14 +43,14 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:2.3.2")
     implementation("io.ktor:ktor-server-core-jvm:2.3.2")
     implementation("io.ktor:ktor-server-cors:2.3.2")
-    implementation("io.ktor:ktor-server-netty-jvm:2.3.2")
+    implementation("io.ktor:ktor-server-netty-jvm:2.3.12")
     implementation("io.ktor:ktor-server-call-logging:2.3.2")
     implementation("io.ktor:ktor-server-status-pages:2.3.2")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.google.guava:guava:30.1-jre")
-    implementation("com.rabbitmq:amqp-client:5.16.0")
+    implementation("com.google.guava:guava:33.3.0-jre")
+    implementation("com.rabbitmq:amqp-client:5.21.0")
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")

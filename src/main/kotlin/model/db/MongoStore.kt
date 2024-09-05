@@ -13,12 +13,12 @@ import utils.env.Environment.env
  * Permite la configuración del acceso a la db
  */
 class MongoStore {
-    var pojoCodecRegistry: CodecRegistry =
+    private var pojoCodecRegistry: CodecRegistry =
         CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
-    var codecRegistry: CodecRegistry =
+    private var codecRegistry: CodecRegistry =
         CodecRegistries.fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry)
 
-    var clientSettings = MongoClientSettings.builder()
+    private var clientSettings = MongoClientSettings.builder()
         .applyConnectionString(ConnectionString(env.databaseUrl))
         .codecRegistry(codecRegistry)
         .build()
